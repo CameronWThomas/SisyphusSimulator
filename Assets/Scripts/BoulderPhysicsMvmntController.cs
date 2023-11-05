@@ -11,12 +11,12 @@ public class BoulderPhysicsMvmntController : MonoBehaviour
     private Vector3 activeForce;
     public float forceMultiplier = 10f;
     private Rigidbody rb;
-    private CameraReference camera;
+    private CameraController camera;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        camera = FindObjectOfType<CameraReference>();
+        camera = FindObjectOfType<CameraController>();
     }
 
     // Update is called once per frame

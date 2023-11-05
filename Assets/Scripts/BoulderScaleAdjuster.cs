@@ -10,7 +10,7 @@ public class BoulderScaleAdjuster : MonoBehaviour
     float StartingMass;
     float StartingDrag;
     [SerializeField]
-    private float scaleSize = 1f;
+    public float scaleSize = 1f;
     [SerializeField]
     private float massScale = 1f;
     [SerializeField]
