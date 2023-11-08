@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +19,10 @@ public class BoulderScaleAdjuster : MonoBehaviour
     private float dragScale = 1f;
     public float scaleFactor = 0.03f;
     public float massScaleFactor = 0.1f;
+
     public float dragScaleFactor = 0.01f;
+    public float initialDragCoeficient = 0.1f;
+    public float dragCoeficient = 1f;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,8 +31,10 @@ public class BoulderScaleAdjuster : MonoBehaviour
         StartingY = transform.position.y;
         StartingScale = transform.localScale;
         StartingMass = rb.mass;
-        StartingDrag = rb.drag; 
-
+        StartingDrag = rb.drag;
+        rb.drag = 0;
+        rb.angularDrag = 0;
+        dragCoeficient = initialDragCoeficient;
     }
 
     // Update is called once per frame
@@ -43,8 +50,23 @@ public class BoulderScaleAdjuster : MonoBehaviour
             massScale = ((transform.position.y - StartingY) * massScaleFactor) + 1;
             rb.mass = StartingMass * massScale;
 
-            dragScale = ((transform.position.y - StartingY) * dragScaleFactor) + 1;
-            rb.drag = StartingDrag * dragScale;
+            dragCoeficient= ((transform.position.y - StartingY) * dragScaleFactor) + initialDragCoeficient;
+            //dragScale = ((transform.position.y - StartingY) * dragScaleFactor) + 1;
+            //rb.drag = StartingDrag * dragScale;
+            //rb.angularDrag = StartingDrag * dragScale;
         }
+
+        ApplyCustomDrag();
+    }
+
+    void ApplyCustomDrag()
+    {
+        // no y, so we have gravity
+        Vector3 dragForce =  new Vector3(
+            rb.velocity.x * dragCoeficient * -1,
+            0,
+            rb.velocity.z * dragCoeficient * -1);
+
+        rb.AddForce(dragForce);
     }
 }

@@ -32,7 +32,7 @@ public class CameraController : MonoBehaviour
         {
             braaaiins.m_BlendUpdateMethod = CinemachineBrain.BrainUpdateMethod.FixedUpdate;
             braaaiins.m_UpdateMethod = CinemachineBrain.UpdateMethod.FixedUpdate;
-            freeLookCamera.Follow = sisyphus.transform;
+            freeLookCamera.Follow = boulder.transform;
             freeLookCamera.LookAt = boulder.transform;
         }
 
