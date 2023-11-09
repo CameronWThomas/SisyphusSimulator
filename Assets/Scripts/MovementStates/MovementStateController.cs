@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.BoulderStuff
 {
     public class MovementStateController : MonoBehaviour
     {
@@ -31,8 +31,9 @@ namespace Assets.Scripts
             onFoot = GetComponent<OnFootState>();
             rolling = GetComponent<RollingBoulderState>();
 
-            boulder = FindObjectOfType<Boulder>();  
-            boulderRb = boulder.GetComponent<Rigidbody>();  
+            boulder = FindObjectOfType<Boulder>();
+            boulderRb = boulder.GetComponent<Rigidbody>();
+            
 
             ChangeState(onFoot);
         }
@@ -81,7 +82,7 @@ namespace Assets.Scripts
 
     public abstract class MovementState : MonoBehaviour
     {
-        GameObject gameObject { get; }
+        GameObject gameObject { get; } 
         MonoBehaviour monoBehaviour { get; }
 
         public CharacterController controller;
