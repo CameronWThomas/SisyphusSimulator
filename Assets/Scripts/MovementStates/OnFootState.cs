@@ -15,11 +15,13 @@ namespace Assets.Scripts.MovementStates
     public class OnFootState : MovementState
     {
 
+        //Jumping shit
+        public float jumpHeight = 5;
 
-        private void Update()
-        {
-            GroundCheck();
-        }
+        public float jumpTimer = 0f;
+        float jumpTime = 0.5f;
+        public float targetedYVelocity = 0f;
+
         public override void Move(UnityEngine.Vector2 inputDir)
         {
             float baseSpeed = moveSpeed;
@@ -60,10 +62,31 @@ namespace Assets.Scripts.MovementStates
 
             }
         }
+
+        public override void Jump()
+        {
+            float effectiveHeight = (jumpHeight / (Physics.gravity.y / -2));
+            
+            if (isGrounded)
+            {
+                SetIsGrounded(false);
+
+
+                SetIsJumping(true);
+                animator.SetJumping(true);
+                float jumpVelocity = Mathf.Sqrt(-2 * Physics.gravity.y * effectiveHeight);
+                velocityY = jumpVelocity;
+                targetedYVelocity = effectiveHeight;
+
+            }
+            
+        }
+
         public override void StateEntered()
         {
             cameraController.SetWalkingCamera();
 
+            animator.SetPushing(false);
             controller.enabled = true;
             Collider myCollider = GetComponent<Collider>();
             myCollider.enabled = true;

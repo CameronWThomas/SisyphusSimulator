@@ -34,7 +34,6 @@ namespace Assets.Scripts.MovementStates
         private void Update()
         {
             CheckDetach();
-            GroundCheck();
         }
         private void FixedUpdate()
         {
@@ -85,7 +84,7 @@ namespace Assets.Scripts.MovementStates
 
             if (targetDistance <= pushDistance)
             {
-
+                animator.SetPushing(true);
                 //TODO: cap speed?
                 rb.AddForce(moveDir * forceMultiplier, ForceMode.Acceleration);
 
@@ -98,6 +97,8 @@ namespace Assets.Scripts.MovementStates
             }
             else 
             {
+
+                animator.SetPushing(false);
                 targetRotation = Quaternion.LookRotation(targetDirection);
                 transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
                  
@@ -184,6 +185,7 @@ namespace Assets.Scripts.MovementStates
 
             Vector3 direction = (boulderFollower.transform.position - transform.position).normalized;
 
+
             SetPosition(direction);
         }
 
@@ -196,6 +198,10 @@ namespace Assets.Scripts.MovementStates
             }
         }
 
+
+        public override void Jump()
+        {
+        }
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.white;

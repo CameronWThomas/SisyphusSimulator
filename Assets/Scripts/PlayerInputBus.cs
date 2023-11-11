@@ -28,6 +28,7 @@ namespace Assets.Scripts
         public InputAction look;
         public InputAction interact;
         public InputAction testRagdoll;
+        public InputAction jump;
         private void Start()
         {
             //bpmc = GetComponent<BoulderPhysicsMvmntController>();
@@ -67,6 +68,21 @@ namespace Assets.Scripts
             testRagdoll.Enable();
             testRagdoll.performed += OnRagdollStart;
             testRagdoll.canceled += OnRagdollEnd;
+
+
+            jump = inputActions.Player.Jump;
+            jump.Enable();
+            jump.performed += OnJumpStart;
+            jump.canceled += OnJumpEnd;
+        }
+
+        void OnJumpStart(InputAction.CallbackContext context)
+        {
+            mc.Jump();
+        }
+        void OnJumpEnd(InputAction.CallbackContext context)
+        {
+
         }
         void OnRagdollStart(InputAction.CallbackContext context)
         {
@@ -93,6 +109,7 @@ namespace Assets.Scripts
             look.Disable();
             interact.Disable();
             testRagdoll.Disable();
+            jump.Disable();
         }
     }
 }

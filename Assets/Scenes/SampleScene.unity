@@ -909,8 +909,15 @@ MonoBehaviour:
   currentState: {fileID: 0}
   boulderRb: {fileID: 958516798}
   boulder: {fileID: 0}
+  groundCheckOffset: {x: 0, y: 0, z: 0}
+  groundCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckRadius: 0.2
   onFoot: {fileID: 0}
   rolling: {fileID: 0}
+  isGrounded: 0
+  isJumping: 0
 --- !u!114 &308043944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -999,6 +1006,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  jump:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 2f858bc0-9f12-402d-a73e-48cbc684df02
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &308043947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1019,14 +1035,7 @@ MonoBehaviour:
   speedStepMultiplier: 30
   moveSpeed: 10
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isGrounded: 0
   velocityY: 0
-  isJumping: 0
-  groundCheckOffset: {x: 0, y: 0, z: 0}
-  groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 192
-  groundCheckRadius: 0.2
   forceMultiplier: 15
   heightOffset: -0.5
   rotateSpeed: 5
@@ -1054,14 +1063,10 @@ MonoBehaviour:
   speedStepMultiplier: 30
   moveSpeed: 6
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isGrounded: 0
   velocityY: 0
-  isJumping: 0
-  groundCheckOffset: {x: 0, y: 0, z: 0}
-  groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 192
-  groundCheckRadius: 0.2
+  jumpHeight: 5
+  jumpTimer: 0
+  targetedYVelocity: 0
 --- !u!114 &308043949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1075,6 +1080,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speedPercent: 0
+  pushing: 0
+  jumping: 0
 --- !u!114 &308043952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1648,6 +1655,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speedPercent: 0
+  pushing: 0
+  jumping: 0
 --- !u!143 &485810705
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1724,6 +1733,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  jump:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 9b1fc656-93e9-4669-bdf7-1866f537fc08
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &485810707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1744,14 +1762,7 @@ MonoBehaviour:
   speedStepMultiplier: 30
   moveSpeed: 10
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isGrounded: 0
   velocityY: 0
-  isJumping: 0
-  groundCheckOffset: {x: 0, y: 0, z: 0}
-  groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 192
-  groundCheckRadius: 0.2
   forceMultiplier: 15
   heightOffset: -0.5
   rotateSpeed: 5
@@ -1779,14 +1790,10 @@ MonoBehaviour:
   speedStepMultiplier: 30
   moveSpeed: 6
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isGrounded: 0
   velocityY: 0
-  isJumping: 0
-  groundCheckOffset: {x: 0, y: 0, z: 0}
-  groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 192
-  groundCheckRadius: 0.2
+  jumpHeight: 5
+  jumpTimer: 0
+  targetedYVelocity: 0
 --- !u!114 &485810709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1803,8 +1810,15 @@ MonoBehaviour:
   currentState: {fileID: 0}
   boulderRb: {fileID: 958516798}
   boulder: {fileID: 0}
+  groundCheckOffset: {x: 0, y: 0, z: 0}
+  groundCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckRadius: 0.2
   onFoot: {fileID: 0}
   rolling: {fileID: 0}
+  isGrounded: 0
+  isJumping: 0
 --- !u!114 &485810710
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2643,14 +2657,7 @@ MonoBehaviour:
   speedStepMultiplier: 30
   moveSpeed: 6
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isGrounded: 0
   velocityY: 0
-  isJumping: 0
-  groundCheckOffset: {x: 0, y: 0, z: 0}
-  groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  groundCheckRadius: 0.2
   forceMultiplier: 15
   heightOffset: 0.4
   rotateSpeed: 5
@@ -2678,14 +2685,10 @@ MonoBehaviour:
   speedStepMultiplier: 30
   moveSpeed: 6
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  isGrounded: 0
   velocityY: 0
-  isJumping: 0
-  groundCheckOffset: {x: 0, y: -1.12, z: 0}
-  groundCheckLayerMask:
-    serializedVersion: 2
-    m_Bits: 192
-  groundCheckRadius: 0.71
+  jumpHeight: 5
+  jumpTimer: 0
+  targetedYVelocity: 0
 --- !u!114 &710003557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2702,8 +2705,15 @@ MonoBehaviour:
   currentState: {fileID: 0}
   boulderRb: {fileID: 958516798}
   boulder: {fileID: 0}
+  groundCheckOffset: {x: 0, y: 0, z: 0}
+  groundCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckRadius: 0.2
   onFoot: {fileID: 0}
   rolling: {fileID: 0}
+  isGrounded: 0
+  isJumping: 0
 --- !u!136 &710003558
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2838,6 +2848,15 @@ MonoBehaviour:
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: b56f9016-dab4-4f54-9436-38a1a8feae63
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  jump:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a598fd1c-0726-4f5c-8128-147f5f648aa6
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
@@ -4533,7 +4552,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174279125}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3018372, y: 1e-45, z: -0, w: 0.9533595}
+  m_LocalRotation: {x: 0.3018372, y: -3e-45, z: 1e-45, w: 0.9533595}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4612,7 +4631,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1175853118}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.26700726, y: -0.000000040616683, z: 0.000000011253514, w: 0.9636945}
+  m_LocalRotation: {x: 0.2670073, y: 2.4695305e-15, z: -7.937144e-16, w: 0.9636945}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4951,7 +4970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateRadius: 0
-  additionalSpacing: 1
+  additionalSpacing: -0.5
   detachDistance: 0
   detachDistanceMultiplier: 3
 --- !u!1 &1286092284
@@ -10486,7 +10505,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1911482963}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.28444615, y: -0.000000016495619, z: 0.0000000048942885, w: 0.958692}
+  m_LocalRotation: {x: 0.28444615, y: 0.00000001649562, z: -0.000000004894289, w: 0.958692}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
