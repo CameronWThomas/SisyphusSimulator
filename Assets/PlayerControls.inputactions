@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TestToggleRagdoll",
+                    "type": "Button",
+                    "id": "eae2f893-6976-4e89-a909-7985907c5054",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -141,6 +150,28 @@
                     "processors": "",
                     "groups": "Default",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "72b638db-1d69-4166-9f86-20748589a133",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Default",
+                    "action": "TestToggleRagdoll",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5c688c4f-9192-4c56-a92a-a23e27a12ec9",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Default",
+                    "action": "TestToggleRagdoll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

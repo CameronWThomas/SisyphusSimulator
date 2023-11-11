@@ -53,6 +53,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TestToggleRagdoll"",
+                    ""type"": ""Button"",
+                    ""id"": ""eae2f893-6976-4e89-a909-7985907c5054"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -165,6 +174,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""72b638db-1d69-4166-9f86-20748589a133"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""TestToggleRagdoll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5c688c4f-9192-4c56-a92a-a23e27a12ec9"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""TestToggleRagdoll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -182,6 +213,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Camera = m_Player.FindAction("Camera", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_TestToggleRagdoll = m_Player.FindAction("TestToggleRagdoll", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -246,6 +278,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Camera;
     private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_TestToggleRagdoll;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -253,6 +286,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Camera => m_Wrapper.m_Player_Camera;
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        public InputAction @TestToggleRagdoll => m_Wrapper.m_Player_TestToggleRagdoll;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -271,6 +305,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @TestToggleRagdoll.started += instance.OnTestToggleRagdoll;
+            @TestToggleRagdoll.performed += instance.OnTestToggleRagdoll;
+            @TestToggleRagdoll.canceled += instance.OnTestToggleRagdoll;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -284,6 +321,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @TestToggleRagdoll.started -= instance.OnTestToggleRagdoll;
+            @TestToggleRagdoll.performed -= instance.OnTestToggleRagdoll;
+            @TestToggleRagdoll.canceled -= instance.OnTestToggleRagdoll;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -315,5 +355,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnCamera(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
+        void OnTestToggleRagdoll(InputAction.CallbackContext context);
     }
 }

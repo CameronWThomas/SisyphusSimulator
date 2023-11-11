@@ -14,36 +14,19 @@ namespace Assets.Scripts.MovementStates
 {
     public class OnFootState : MovementState
     {
-        public bool isGrounded = false;
-
-        public float moveSpeed = 6;
-        public float speedStepMultiplier = 30f;
-
-        public float currentSpeed;
-
-        public float velocityY;
-        public bool isJumping = false;
-
-        public UnityEngine.Quaternion targetRotation;
-        float rotationSpeed = 3;
-
-
-
-        [SerializeField] Vector3 groundCheckOffset;
-        [SerializeField] LayerMask groundCheckLayerMask;
-        [SerializeField] float groundCheckRadius = 0.2f;
 
 
         private void Update()
         {
             GroundCheck();
         }
-
         public override void Move(UnityEngine.Vector2 inputDir)
         {
             float baseSpeed = moveSpeed;
             float targetSpeed = baseSpeed * inputDir.magnitude;
             currentSpeed = Mathf.SmoothStep(currentSpeed, targetSpeed, speedStepMultiplier * Time.deltaTime);
+
+            animator.speedPercent = currentSpeed / moveSpeed;
 
             float moveAmount = Mathf.Abs(inputDir.x) + Mathf.Abs(inputDir.y);
             var moveInput = (new Vector3(inputDir.x, 0, inputDir.y)).normalized;
@@ -63,6 +46,8 @@ namespace Assets.Scripts.MovementStates
 
             var velocity = moveDir * currentSpeed;
             velocity.y = velocityY;
+
+
 
 
             controller.Move(velocity * Time.deltaTime);
@@ -85,18 +70,7 @@ namespace Assets.Scripts.MovementStates
             //controller.transform.parent = null;
         }
 
-        void GroundCheck()
-        {
-            Vector3 checkPos = transform.TransformPoint(groundCheckOffset);
-            isGrounded = Physics.CheckSphere(checkPos, groundCheckRadius, groundCheckLayerMask);
-        }
-        private void OnDrawGizmos()
-        {
-            //Drawing the ground checker
-            Vector3 checkPos = transform.TransformPoint(groundCheckOffset);
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(checkPos, groundCheckRadius);
-        }
+        
 
     }
 }

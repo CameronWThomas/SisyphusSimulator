@@ -84,17 +84,45 @@ namespace Assets.Scripts.BoulderStuff
     {
         GameObject gameObject { get; } 
         MonoBehaviour monoBehaviour { get; }
-
+        public SisyphusAnimator animator;
         public CharacterController controller;
         public CameraController cameraController;
         public Rigidbody rb;
+
+
+        public float currentSpeed;
+        public float speedStepMultiplier = 30f;
+        public float moveSpeed = 10f;
+        public UnityEngine.Quaternion targetRotation;
+
+
+        public bool isGrounded = false;
+        public float velocityY;
+        public bool isJumping = false;
+
+
+
+
+        [SerializeField] Vector3 groundCheckOffset;
+        [SerializeField] LayerMask groundCheckLayerMask;
+        [SerializeField] float groundCheckRadius = 0.2f;
+
 
         //must not start active
         private void Awake()
         {
             enabled = false;
+            animator = GetComponent<SisyphusAnimator>();
         }
-
+        private void Update()
+        {
+            GroundCheck();
+        }
+        public void GroundCheck()
+        {
+            Vector3 checkPos = transform.TransformPoint(groundCheckOffset);
+            isGrounded = Physics.CheckSphere(checkPos, groundCheckRadius, groundCheckLayerMask);
+        }
         public void OnEnter(CharacterController me, Rigidbody boulder, CameraController camera)
         {
             controller = me;
@@ -108,5 +136,14 @@ namespace Assets.Scripts.BoulderStuff
         }
         public abstract void StateEntered();
         public abstract void Move(Vector2 inputDir);
+
+
+        private void OnDrawGizmos()
+        {
+            //Drawing the ground checker
+            Vector3 checkPos = transform.TransformPoint(groundCheckOffset);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(checkPos, groundCheckRadius);
+        }
     }
 }
