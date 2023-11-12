@@ -16,20 +16,25 @@ public class PlayerController : MonoBehaviour
     public GameObject LeftHand;
     public GameObject RightHand;
 
-    private Rigidbody rb;
+    private Rigidbody m_Rb;
+    private Rigidbody m_BounderRb;
     private CameraReference cameraReference;
     private Vector3 m_MoveDir;
     private bool m_PushingBoulder = false;
 
     private Quaternion planarRotation2 => cameraReference.PlanarRotation2;
 
+    private float m_BoulderForceMultiplier => m_BounderRb.mass * 7;
+
     
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        rb = GetComponent<Rigidbody>();
+        m_Rb = GetComponent<Rigidbody>();
         cameraReference = FindObjectOfType<CameraReference>();
+
+        m_BounderRb = Boulder.GetComponent<Rigidbody>();
 
         LeftHand.SetActive(false);
         RightHand.SetActive(false);
@@ -92,12 +97,11 @@ public class PlayerController : MonoBehaviour
 
         var correctionDirection = boulderOnLeftSide ? transform.right : -transform.right;
         //TODO make it a slerp?
-        var correctionForce = 100 * ForceMultiplier * Time.fixedDeltaTime * correctionDirection * (boulderAngle / m_PushActivationAngle);
+        var correctionForce = m_BoulderForceMultiplier * ForceMultiplier * Time.fixedDeltaTime * correctionDirection * (boulderAngle / m_PushActivationAngle);
 
-        var boulderRb = Boulder.GetComponent<Rigidbody>();
-        boulderRb.AddForce(correctionForce, ForceMode.Force);
+        m_BounderRb.AddForce(correctionForce, ForceMode.Force);
 
-        var boulderVelocityDirection = boulderRb.velocity.normalized;
+        var boulderVelocityDirection = m_BounderRb.velocity.normalized;
         var boulderToPlayer = -boulderDirection;
         var boulderApproaching = Vector3.Angle(boulderToPlayer, boulderVelocityDirection) < m_HoldBackAngle;
         var boulderApproachingLeft = Vector3.Angle(Vector3.Cross(boulderToPlayer, boulderVelocityDirection), transform.up) > 90;
@@ -105,8 +109,8 @@ public class PlayerController : MonoBehaviour
         if (boulderApproaching &&
             (boulderApproachingLeft == leftHandPress || !boulderApproachingLeft == rightHandPress))
         {
-            var resistanceForce = 100 * ForceMultiplier * Time.fixedDeltaTime * boulderDirection * boulderRb.velocity.magnitude;
-            boulderRb.AddForce(resistanceForce, ForceMode.Force);
+            var resistanceForce = m_BoulderForceMultiplier * ForceMultiplier * Time.fixedDeltaTime * boulderDirection * m_BounderRb.velocity.magnitude;
+            m_BounderRb.AddForce(resistanceForce, ForceMode.Force);
         }
 
         //TODO nudge the boulder towards in front of you
@@ -120,18 +124,19 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        var rigidBody = m_PushingBoulder ? Boulder.GetComponent<Rigidbody>() : rb;        
+        var rigidBody = m_PushingBoulder ? m_BounderRb : m_Rb;
+        var extraForce = m_PushingBoulder ? m_BoulderForceMultiplier : 750;
 
         // Move
-        var moveForce = 750 * ForceMultiplier * Time.fixedDeltaTime * m_MoveDir;
+        var moveForce = extraForce * ForceMultiplier * Time.fixedDeltaTime * m_MoveDir;
         rigidBody.AddForce(moveForce, ForceMode.Force);
-        if (!m_PushingBoulder && rb.velocity.magnitude > MaxSpeed)
+        if (!m_PushingBoulder && m_Rb.velocity.magnitude > MaxSpeed)
         {
-            rb.velocity = rb.velocity.normalized * MaxSpeed;
+            m_Rb.velocity = m_Rb.velocity.normalized * MaxSpeed;
         }
         else if (m_PushingBoulder)
         {
-            rb.velocity = rigidBody.velocity;
+            m_Rb.velocity = rigidBody.velocity;
         }
 
         // Rotate
