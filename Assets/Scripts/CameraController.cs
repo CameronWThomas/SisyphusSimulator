@@ -31,7 +31,7 @@ public class CameraController : MonoBehaviour
         if (braaaiins != null)
         {
             braaaiins.m_BlendUpdateMethod = CinemachineBrain.BrainUpdateMethod.FixedUpdate;
-            braaaiins.m_UpdateMethod = CinemachineBrain.UpdateMethod.FixedUpdate;
+            //braaaiins.m_UpdateMethod = CinemachineBrain.UpdateMethod.FixedUpdate;
             freeLookCamera.Follow = boulder.transform;
             freeLookCamera.LookAt = boulder.transform;
         }
@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour
         if (braaaiins != null)
         {
             braaaiins.m_BlendUpdateMethod = CinemachineBrain.BrainUpdateMethod.LateUpdate;
-            braaaiins.m_UpdateMethod = CinemachineBrain.UpdateMethod.LateUpdate;
+            //braaaiins.m_UpdateMethod = CinemachineBrain.UpdateMethod.LateUpdate;
             freeLookCamera.Follow = sisyphus.transform;
             freeLookCamera.LookAt = sisyphus.transform;
         }

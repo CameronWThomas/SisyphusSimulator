@@ -12,6 +12,16 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Black
+    second: {fileID: 2100000, guid: 05baf8ba4e7cc6d48951fd800913bd06, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BlackOrange
+    second: {fileID: 2100000, guid: 431a5dffd3fbdb24f9034843154b9f81, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Face
     second: {fileID: 2100000, guid: ecdf5a8e27a72074aa58ce49863e8605, type: 2}
   - first:
@@ -19,6 +29,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Hair
     second: {fileID: 2100000, guid: 773ca053880fb56428d43aa873f0d0eb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Orange
+    second: {fileID: 2100000, guid: 431a5dffd3fbdb24f9034843154b9f81, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
