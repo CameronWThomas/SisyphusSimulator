@@ -542,7 +542,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -769,7 +769,7 @@ Transform:
   m_GameObject: {fileID: 958516796}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.403, z: 2.68}
+  m_LocalPosition: {x: 0, y: 1.403, z: 46.03}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1012,7 +1012,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3018372, y: -0, z: -0, w: 0.9533595}
-  m_LocalPosition: {x: 0.37594336, y: 3.7500505, z: -5.710955}
+  m_LocalPosition: {x: 0.37594336, y: 3.7500505, z: 37.63904}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1208,7 +1208,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -5038,7 +5038,7 @@ Transform:
   m_GameObject: {fileID: 1442411378}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.37594336, y: 3.7500505, z: -5.710955}
+  m_LocalPosition: {x: 0.37594336, y: 3.7500505, z: 37.63904}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5168,7 +5168,7 @@ Transform:
   m_GameObject: {fileID: 1726915561}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.09972246, y: 1.12, z: 0}
+  m_LocalPosition: {x: 0.09972246, y: 1.12, z: 43.35}
   m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -5218,7 +5218,7 @@ Rigidbody:
   m_GameObject: {fileID: 1726915561}
   serializedVersion: 4
   m_Mass: 50
-  m_Drag: 0
+  m_Drag: 0.3
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -5248,13 +5248,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57a62369f20e2034d8a9bb2518014d19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ForceMultiplier: 50
+  MoveForceMultiplier: 50
   RotationSpeed: 5
-  MaxSpeed: 10
-  m_RayDistance: 2
-  m_PushActivationAngle: 45
-  m_HoldBackAngle: 45
-  Boulder: {fileID: 958516796}
+  MaxSpeed: 6
+  BoulderForceModifier: 5
+  MaxCorrectiveVelocity: 0.45
+  OvercorrectionCounterStrength: 10
+  MinResistiveForceApproachSpeed: 0.1
+  ResistiveForceModifer: 50
   LeftHand: {fileID: 1064513090}
   RightHand: {fileID: 853668266}
 --- !u!114 &1726915569

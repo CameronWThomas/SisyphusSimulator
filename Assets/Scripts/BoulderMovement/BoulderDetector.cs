@@ -15,9 +15,11 @@ public class BoulderDetector : MonoBehaviour
 
     public bool IsInRange { get; private set; }
     public bool BoulderOnLeft { get; private set; }
-    public float ApproachAnglePercent { get; private set; }
+    public float ContactAnglePercent { get; private set; }
+    public Vector3 ApproachingVelocity { get; private set; }
 
     private GameObject m_Boulder;
+    private float m_Height => GetComponent<CapsuleCollider>().height;
 
     // Start is called before the first frame update
     void Start()
@@ -59,7 +61,9 @@ public class BoulderDetector : MonoBehaviour
 
         IsInRange = true;
         BoulderOnLeft = hitAngle < 0;
-        ApproachAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(hitAngle) / (DetectionAngle / 2));
+        ContactAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(hitAngle) / (DetectionAngle / 2));
+        var approachSpeed = Vector3.Dot(-boulderDirection, m_Boulder.GetComponent<Rigidbody>().velocity);
+        ApproachingVelocity = approachSpeed <= 0 ? Vector3.zero : -1 * approachSpeed * boulderDirection;
     }
 
     private void OnDrawGizmos()
@@ -69,14 +73,30 @@ public class BoulderDetector : MonoBehaviour
         Handles.color = new Color(0, 0, 1, colorAlpha);
         if (IsInRange)
         {
-            colorAlpha = ApproachAnglePercent;
+            colorAlpha = ContactAnglePercent;
             Handles.color = BoulderOnLeft
                 ? new Color(1, 0, 0, colorAlpha)
                 : new Color(1, .5f, 0, colorAlpha);
         }
 
+        var forward = transform.forward;
+        var up = transform.up;
+        if (Physics.Raycast(transform.position, Vector3.down, out var hitInfo, m_Height)) //TODO check for ground tag?
+        {
+            up = hitInfo.normal;
+            var angle = -Mathf.Abs(90f - Vector3.Angle(forward, up));
+            forward = Quaternion.Euler(angle, 0f, 0f) * forward;
+        }
+
         var detectionAngleHalf = DetectionAngle / 2f;
-        Handles.DrawSolidArc(transform.position, transform.up, transform.forward, detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(transform.position, transform.up, transform.forward, -detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(transform.position, up, forward, detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(transform.position, up, forward, -detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(transform.position, transform.right, forward, -detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(transform.position, transform.right, forward, detectionAngleHalf, DetectionRadius);
+
+        if (!m_Boulder.IsUnityNull())
+        {
+            Handles.DrawLine(m_Boulder.transform.position, m_Boulder.transform.position + ApproachingVelocity, 4f);
+        }
     }
 }
