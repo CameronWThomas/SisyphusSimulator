@@ -22,11 +22,12 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_MoveDir;
     private bool m_PushingBoulder = false;
 
+    private BoulderDetector m_BoulderDetector;
+
     private Quaternion planarRotation2 => cameraReference.PlanarRotation2;
 
     private float m_BoulderForceMultiplier => m_BounderRb.mass * 7;
 
-    
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
         cameraReference = FindObjectOfType<CameraReference>();
 
         m_BounderRb = Boulder.GetComponent<Rigidbody>();
+        m_BoulderDetector = GetComponent<BoulderDetector>();
 
         LeftHand.SetActive(false);
         RightHand.SetActive(false);
@@ -50,9 +52,9 @@ public class PlayerController : MonoBehaviour
             : (planarRotation2 * moveInput).normalized;
 
         BoulderPushing();
-
         MovementAndRotation();
     }
+
 
     private void BoulderPushing()
     {
@@ -76,7 +78,7 @@ public class PlayerController : MonoBehaviour
         var boulderAngle = Vector3.Angle(transform.forward, boulderDirection);
         var inBoulderPushDirection = boulderAngle < m_PushActivationAngle;
         var boulderOnLeftSide = Vector3.Angle(Vector3.Cross(transform.forward, boulderDirection), transform.up) > 90;
-        Debug.Log($"Boulder on left side? {boulderOnLeftSide}");
+        //Debug.Log($"Boulder on left side? {boulderOnLeftSide}");
         //Debug.Log($"Boulder on left side? {boulderOnLeftSide} boulderAngle={boulderAngle}");
         
         if (!inBoulderPushDirection ||
@@ -86,11 +88,11 @@ public class PlayerController : MonoBehaviour
             !hitInfo.transform.gameObject == Boulder)
         {
             m_PushingBoulder = false;
-            Debug.Log($"Pushing boulder? {false}");
+            //Debug.Log($"Pushing boulder? {false}");
 
             return;
         }
-        Debug.Log($"Pushing boulder? {true}");
+        //Debug.Log($"Pushing boulder? {true}");
 
 
         m_PushingBoulder = leftHandPress || rightHandPress;
