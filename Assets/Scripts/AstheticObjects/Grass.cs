@@ -12,6 +12,7 @@ namespace Assets.Scripts.AstheticObjects
     {
         Renderer[] rends;
         WindBox[] windBoxes;
+        public float windStrength = 2f;
         private void Start()
         {
             rends = GetComponentsInChildren<Renderer>();
