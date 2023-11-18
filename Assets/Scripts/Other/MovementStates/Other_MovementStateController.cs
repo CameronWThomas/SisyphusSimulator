@@ -10,17 +10,18 @@ namespace Assets.Scripts.BoulderStuff
         private Vector3 moveDir;
 
         private CameraController cameraRef;
-
         private MovementController[] movementControllers;
-
         private MovementController currentMovementController;
+        private Other_BoulderDetector boulderDetector;
+
         private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
         
         private void Start()
         {
             cameraRef = FindObjectOfType<CameraController>();
             movementControllers = GetComponents<MovementController>();
-            
+            boulderDetector = GetComponent<Other_BoulderDetector>();
+
             foreach (var movementController in movementControllers)
             {
                 movementController.Disable();
@@ -38,10 +39,19 @@ namespace Assets.Scripts.BoulderStuff
 
             currentMovementController.inputMoveDir = moveDir;
 
+            MovementState newState = CurrentMovementState;
             if (Input.GetKeyDown(KeyCode.R))
             {
-                var newState = CurrentMovementState == MovementState.Ragdolling
+                newState = CurrentMovementState == MovementState.Ragdolling
                     ? MovementState.OnFoot : MovementState.Ragdolling;
+            }
+            else if (CurrentMovementState != MovementState.Ragdolling)
+            {
+                newState = boulderDetector.IsPushing ? MovementState.Pushing : MovementState.OnFoot;
+            }
+
+            if (newState != CurrentMovementState)
+            {
                 ChangeState(newState);
             }
         }

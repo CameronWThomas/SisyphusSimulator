@@ -1,11 +1,116 @@
-﻿//using Assets.Scripts.BoulderStuff;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using UnityEngine;
-//using UnityEngine.ProBuilder.Shapes;
+﻿using Assets.Scripts.BoulderStuff;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.ProBuilder.Shapes;
+using static BoulderDetector;
+
+namespace Assets.Scripts.MovementStates
+{
+    public class RollingBoulderMovementController : MovementController
+    {
+        public float forceModifier = 30f;
+        public float slowDownModifer = 10f;
+        public float maxSpeed = 5f;
+
+        public float maxCorrectiveVelocity = .45f;
+        public float overcorrectionCounterStrength = 10f;
+
+        public float minResistiveForceApproachSpeed = .1f;
+        public float resistiveForceModifer = 20f;
+
+
+        public override MovementState ApplicableMovementState => MovementState.Pushing;
+
+        private const float ConstantForceModifier = 750f;
+
+        private Rigidbody boulderRb;
+        private Other_BoulderDetector boulderDetector;
+
+        public override void Enable()
+        {
+            base.Enable();
+            animator.SetBool("pushing", true);
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            boulderRb = boulderTransform.GetComponent<Rigidbody>();
+            boulderDetector = GetComponent<Other_BoulderDetector>();
+        }
+
+        void Update()
+        {
+            //animator.SetFloat("speedPercent", rb.velocity.magnitude / maxSpeed);
+            animator.SetFloat("speedPercent", 1f);
+        }
+
+        private void FixedUpdate()
+        {
+            BoulderCorrection();
+            BoulderResistance();
+
+            lastMoveDir = Vector3.zero;
+            if (inputMoveDir != Vector3.zero)
+            {
+                Move();
+                Rotate();
+            }
+        }
+
+        private void BoulderCorrection()
+        {
+            var movingAwayFromCenter = boulderDetector.CorrectionVelocity * boulderDetector.CorrectionModifier < 0f;
+            if (!(movingAwayFromCenter || boulderDetector.CorrectionVelocity < maxCorrectiveVelocity))
+            {
+                return;
+            }
+
+            var overCorrectionModifier = movingAwayFromCenter ? overcorrectionCounterStrength : 1f;
+
+            var correctionForce = overCorrectionModifier * ConstantForceModifier * boulderDetector.CorrectionModifier * Time.fixedDeltaTime * transform.right;
+            boulderRb.AddForce(correctionForce, ForceMode.Impulse);
+        }
+
+        private void BoulderResistance()
+        {
+            Debug.Log($"Boulder vel={boulderDetector.Resistance.magnitude}");
+            if (boulderDetector.Resistance.magnitude < minResistiveForceApproachSpeed)
+            {
+                return;
+            }
+
+            boulderRb.AddForce(resistiveForceModifer * boulderDetector.Resistance, ForceMode.Impulse);
+        }
+
+        private void Move()
+        {
+            var correctedMoveDir = GetCorrectedMoveDir();
+            if (correctedMoveDir == Vector3.zero)
+            {
+                return;
+            }
+
+            lastMoveDir = correctedMoveDir;
+            boulderRb.AddForce(50 * boulderRb.mass * forceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
+
+            rb.velocity = boulderRb.velocity;
+        }
+
+        //TODO move to base
+        private void Rotate()
+        {
+            var lookRotation = Quaternion.LookRotation(inputMoveDir);
+            var targetRotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.fixedDeltaTime * 5 * 180);
+            transform.rotation = targetRotation;
+        }
+    }
+}
+
 
 //namespace Assets.Scripts.MovementStates
 //{
@@ -112,8 +217,8 @@
 //                animator.SetPushing(false);
 //                targetRotation = Quaternion.LookRotation(targetDirection);
 //                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.fixedDeltaTime);
-                 
-                
+
+
 //            }
 
 
@@ -231,6 +336,6 @@
 
 //    }
 
-    
+
 
 //}

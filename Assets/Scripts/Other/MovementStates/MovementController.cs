@@ -17,7 +17,7 @@ public enum MovementState
 
 public abstract class MovementController : MonoBehaviour
 {
-    protected Animator animator;
+    protected Animator animator; //TODO animation should be managed by somethign else. Here is fine for now
     protected Rigidbody rb;
     protected Transform boulderTransform;
     protected Vector3 lastMoveDir;

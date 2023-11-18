@@ -10,6 +10,8 @@ public class Other_BoulderDetector : MonoBehaviour
     [Range(0f, 10f)]
     public float DetectionRadius = 1.5f;
 
+    //TODO have some buffer where the left hand can be used with the boulder on the right if it is within a small degree
+
     public bool IsPushing { get; private set; }
     public bool BoulderOnLeft { get; private set; }
     public bool LeftHand { get; private set; }
