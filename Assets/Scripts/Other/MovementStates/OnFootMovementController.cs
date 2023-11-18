@@ -9,19 +9,16 @@ namespace Assets.Scripts.MovementStates
     {
         public float forceModifier = 30f;
         public float slowDownModifer = 10f;
-        public float maxSpeed = 5f;
 
         [Range(0f, 2f)]
         public float boulderMovementPreventionDistance = 1f;
 
         public override MovementState ApplicableMovementState => MovementState.OnFoot;
 
-        private float boulderRadius => boulderTransform.GetComponent<SphereCollider>().radius;
-
         void Update()
         {
             //TODO will need to set differently. Probably have something that is responsible for animation? maybe based on movement state?
-            animator.SetFloat("speedPercent", rb.velocity.magnitude / maxSpeed);
+            animator.SetFloat("speedPercent", rb.velocity.magnitude / MaxSpeed);
         }
 
         public override void Enable()
@@ -46,26 +43,29 @@ namespace Assets.Scripts.MovementStates
 
         private void Move()
         {
-            var correctedMoveDir = GetCorrectedMoveDir();
+            var correctedMoveDir = GetCorrectedMoveDir(Position);
             if (correctedMoveDir == Vector3.zero)
             {
                 return;
             }
 
-            // If close to the boulder, prevent force being applied in the direction of the boulder so it is unmovable
-            if ((boulderTransform.position - Position).magnitude < boulderRadius + boulderMovementPreventionDistance)
+            var boulderTowardsUs = Vector3.Dot(boulderRb.velocity, (Position - boulderTransform.position).normalized);
+            if (boulderTowardsUs < 1f && (boulderTransform.position - Position).magnitude < BoulderRadius + boulderMovementPreventionDistance)
             {
                 var toBoulderDirection = (boulderTransform.position - Position).normalized;
                 var toBoulderMagnitude = Vector3.Dot(toBoulderDirection, correctedMoveDir);
-                correctedMoveDir -= toBoulderMagnitude * 2f * toBoulderDirection;
+                if (toBoulderMagnitude > 0)
+                {
+                    correctedMoveDir -= toBoulderMagnitude * 2f * toBoulderDirection;
+                }
             }
 
             lastMoveDir = correctedMoveDir;
             rb.AddForce(50 * rb.mass * forceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
 
-            if (rb.velocity.magnitude > maxSpeed)
+            if (rb.velocity.magnitude > MaxSpeed)
             {
-                rb.velocity =  rb.velocity.normalized * maxSpeed;
+                rb.velocity =  rb.velocity.normalized * MaxSpeed;
             }
         }
 

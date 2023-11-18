@@ -12,22 +12,20 @@ namespace Assets.Scripts.MovementStates
 {
     public class RollingBoulderMovementController : MovementController
     {
-        public float forceModifier = 30f;
-        public float slowDownModifer = 10f;
-        public float maxSpeed = 5f;
+        public float constantForceModifier = 20f;
+        public float moveForceModifier = 10f;
 
         public float maxCorrectiveVelocity = .45f;
+        public float correctionForceModifier = 4f;
         public float overcorrectionCounterStrength = 10f;
 
         public float minResistiveForceApproachSpeed = .1f;
-        public float resistiveForceModifer = 20f;
+        public float resistiveForceModifer = 5f;
 
 
         public override MovementState ApplicableMovementState => MovementState.Pushing;
 
-        private const float ConstantForceModifier = 750f;
 
-        private Rigidbody boulderRb;
         private Other_BoulderDetector boulderDetector;
 
         public override void Enable()
@@ -39,14 +37,12 @@ namespace Assets.Scripts.MovementStates
         protected override void Awake()
         {
             base.Awake();
-            boulderRb = boulderTransform.GetComponent<Rigidbody>();
             boulderDetector = GetComponent<Other_BoulderDetector>();
-        }
+        }        
 
         void Update()
         {
-            //animator.SetFloat("speedPercent", rb.velocity.magnitude / maxSpeed);
-            animator.SetFloat("speedPercent", 1f);
+            animator.SetFloat("speedPercent", rb.velocity.magnitude / MaxSpeed);
         }
 
         private void FixedUpdate()
@@ -72,33 +68,39 @@ namespace Assets.Scripts.MovementStates
 
             var overCorrectionModifier = movingAwayFromCenter ? overcorrectionCounterStrength : 1f;
 
-            var correctionForce = overCorrectionModifier * ConstantForceModifier * boulderDetector.CorrectionModifier * Time.fixedDeltaTime * transform.right;
+            var correctionForce = overCorrectionModifier * correctionForceModifier * constantForceModifier * boulderDetector.CorrectionModifier * Time.fixedDeltaTime * transform.right;
             boulderRb.AddForce(correctionForce, ForceMode.Impulse);
         }
 
         private void BoulderResistance()
         {
-            Debug.Log($"Boulder vel={boulderDetector.Resistance.magnitude}");
             if (boulderDetector.Resistance.magnitude < minResistiveForceApproachSpeed)
             {
                 return;
             }
 
-            boulderRb.AddForce(resistiveForceModifer * boulderDetector.Resistance, ForceMode.Impulse);
+            //boulderRb.AddForce(constantForceModifier * resistiveForceModifer * boulderDetector.Resistance, ForceMode.Impulse);
+            var force = resistiveForceModifer * boulderDetector.Resistance;
+            boulderRb.AddForce(force, ForceMode.Impulse);
+            rb.AddForce(-force / 10f, ForceMode.Impulse);
         }
 
         private void Move()
         {
-            var correctedMoveDir = GetCorrectedMoveDir();
+            var correctedMoveDir = GetCorrectedMoveDir(boulderTransform.position);
             if (correctedMoveDir == Vector3.zero)
             {
                 return;
             }
 
             lastMoveDir = correctedMoveDir;
-            boulderRb.AddForce(50 * boulderRb.mass * forceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
+            boulderRb.AddForce(constantForceModifier * boulderRb.mass * moveForceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
 
             rb.velocity = boulderRb.velocity;
+            if (rb.velocity.magnitude > MaxSpeed)
+            {
+                rb.velocity = rb.velocity.normalized * MaxSpeed;
+            }
         }
 
         //TODO move to base

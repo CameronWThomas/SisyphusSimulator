@@ -56,17 +56,17 @@ public class BoulderScaleAdjuster : MonoBehaviour
             //rb.angularDrag = StartingDrag * dragScale;
         }
 
-        ApplyCustomDrag();
+        //ApplyCustomDrag();
     }
 
-    void ApplyCustomDrag()
-    {
-        // no y, so we have gravity
-        Vector3 dragForce =  new Vector3(
-            rb.velocity.x * dragCoeficient * -1,
-            0,
-            rb.velocity.z * dragCoeficient * -1);
+    //void ApplyCustomDrag()
+    //{
+    //    // no y, so we have gravity
+    //    Vector3 dragForce =  new Vector3(
+    //        rb.velocity.x * dragCoeficient * -1,
+    //        0,
+    //        rb.velocity.z * dragCoeficient * -1);
 
-        rb.AddForce(dragForce);
-    }
+    //    rb.AddForce(dragForce);
+    //}
 }
