@@ -14,6 +14,7 @@ namespace Assets.Scripts.BoulderStuff
         private MovementController[] movementControllers;
 
         private MovementController currentMovementController;
+        private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
         
         private void Start()
         {
@@ -22,11 +23,11 @@ namespace Assets.Scripts.BoulderStuff
             
             foreach (var movementController in movementControllers)
             {
-                movementController.enabled = false;
+                movementController.Disable();
             }
 
             currentMovementController = movementControllers.First(x => x.ApplicableMovementState == MovementState.OnFoot);
-            currentMovementController.enabled = true;
+            currentMovementController.Enable();
         }
 
         private void Update()
@@ -35,30 +36,29 @@ namespace Assets.Scripts.BoulderStuff
             moveDir = (new Vector3(input.x, 0, input.y).normalized) * input.magnitude;
             moveDir = cameraRef.PlanarRotation2 * moveDir;
 
-            currentMovementController.moveDir = moveDir;
+            currentMovementController.inputMoveDir = moveDir;
 
             if (Input.GetKeyDown(KeyCode.R))
             {
-                var ragdollingState = GetComponent<RagdollController>();
-                if (ragdollingState.ragdolling)
-                {
-                    ragdollingState.DisableRagdoll();
-                }
-                else
-                {
-                    ragdollingState.EnableRagdoll();
-                }
+                var newState = CurrentMovementState == MovementState.Ragdolling
+                    ? MovementState.OnFoot : MovementState.Ragdolling;
+                ChangeState(newState);
             }
         }
 
         public void ChangeState(MovementState newState)
         {
-            // Activate new state and deactivate other
-            currentMovementController.enabled = false;
-            currentMovementController = movementControllers.First(x => x.ApplicableMovementState == newState);
-            currentMovementController.enabled = true;
+            if (currentMovementController.ApplicableMovementState == newState)
+            {
+                return;
+            }
 
-            currentMovementController.moveDir = moveDir;
+            // Activate new state and deactivate other
+            currentMovementController.Disable();
+            currentMovementController = movementControllers.First(x => x.ApplicableMovementState == newState);
+            currentMovementController.Enable();
+
+            currentMovementController.inputMoveDir = moveDir;
         }
     }
 }

@@ -1,35 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Accessibility;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.MovementStates
 {
-    public class RagdollController : MonoBehaviour
+    public class RagdollMovementController : MovementController
     { 
-        Animator animator;
         List<Rigidbody> bones;
         public Rigidbody root;
 
-        Rigidbody rb;
-
         public bool ragdolling = false;
 
-        private void Awake()
+        public override MovementState ApplicableMovementState => MovementState.Ragdolling;
+
+        protected override void Awake()
         {
-            rb = GetComponent<Rigidbody>();
+            base.Awake();
+
             bones = root.GetComponentsInChildren<Rigidbody>().ToList();
-            animator = GetComponent<Animator>();
-
             DisableRagdoll();
-
-            //TODO this should get info from input bus rather than have the controller update it. Those should be private methods
         }
 
-        public void EnableRagdoll()
+        public override void Enable()
+        {
+            base.Enable();
+            EnableRagdoll();
+        }
+
+        public override void Disable()
+        {
+            base.Disable();
+            DisableRagdoll();
+        }
+
+        private void EnableRagdoll()
         {
             rb.isKinematic = true;
             rb.useGravity = false;
@@ -45,7 +49,7 @@ namespace Assets.Scripts
             ragdolling= true;
         }
 
-        public void DisableRagdoll()
+        private void DisableRagdoll()
         {
             rb.isKinematic = false;
             rb.useGravity = true;

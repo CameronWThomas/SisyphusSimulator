@@ -20,7 +20,9 @@ public class Other_BoulderDetector : MonoBehaviour
 
     private GameObject boulder;
     private BoulderLocationInfo lastBli;
-    private float Height => GetComponent<CapsuleCollider>().height * 1.2f;
+    private float Height => GetComponent<CapsuleCollider>().height;
+    private Vector3 Position => transform.position + Height / 2 * transform.up;
+    private float HalfDetectionAngle => DetectionAngle / 2f;
 
     void Start()
     {
@@ -52,7 +54,7 @@ public class Other_BoulderDetector : MonoBehaviour
         }
 
         var sign = BoulderOnLeft ? 1 : -1;
-        var contactAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(bli.hitAngle) / (DetectionAngle / 2));
+        var contactAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(bli.hitAngle) / HalfDetectionAngle);
         CorrectionModifier = Mathf.Pow(contactAnglePercent, 1.5f) * sign;
         LeftHand = leftHandPress;
         RightHand = rightHandPress;
@@ -71,34 +73,34 @@ public class Other_BoulderDetector : MonoBehaviour
     {
         var boulderLocationInfo = new BoulderLocationInfo() { isInRange = false };
 
-        var boulderDirection = (boulder.transform.position - transform.position).normalized;
+        var boulderDirection = (boulder.transform.position - Position).normalized;
 
-        if (!Physics.Raycast(transform.position, boulderDirection, out var hitInfo, DetectionRadius) ||
+        if (!Physics.Raycast(Position, boulderDirection, out var hitInfo, DetectionRadius) ||
             hitInfo.transform.gameObject != boulder)
         {
             return boulderLocationInfo;
         }
 
-        var hitDirection = (hitInfo.point - transform.position).normalized;
+        var hitDirection = (hitInfo.point - Position).normalized;
         var hitAngle = Vector3.SignedAngle(transform.forward, hitDirection, transform.up);
-        if (Mathf.Abs(hitAngle) > DetectionAngle / 2)
+        if (Mathf.Abs(hitAngle) > HalfDetectionAngle)
         {
             var rotation = hitAngle > 0
-                ? Quaternion.Euler(0, hitAngle - DetectionAngle / 2, 0)
-                : Quaternion.Euler(0, hitAngle + DetectionAngle / 2, 0);
+                ? Quaternion.Euler(0, hitAngle - HalfDetectionAngle, 0)
+                : Quaternion.Euler(0, hitAngle + HalfDetectionAngle, 0);
             var raycastDirection = rotation * hitDirection;
 
-            if (!Physics.Raycast(transform.position, raycastDirection, out var secondHitInfo, DetectionRadius) ||
+            if (!Physics.Raycast(Position, raycastDirection, out var secondHitInfo, DetectionRadius) ||
                 secondHitInfo.transform.gameObject != boulder)
             {
                 return boulderLocationInfo;
             }
 
-            var secondHitDirection = (secondHitInfo.point - transform.position).normalized;
+            var secondHitDirection = (secondHitInfo.point - Position).normalized;
             hitAngle = Vector3.SignedAngle(transform.forward, secondHitDirection, transform.up);
         }
 
-
+        boulderLocationInfo.isInRange = true;
         boulderLocationInfo.hitAngle = hitAngle;
         boulderLocationInfo.toBoulderDirection = boulderDirection;
         return boulderLocationInfo;
@@ -111,7 +113,7 @@ public class Other_BoulderDetector : MonoBehaviour
         Handles.color = new Color(0, 0, 1, colorAlpha);
         if (lastBli.isInRange)
         {
-            colorAlpha = Mathf.Abs(CorrectionModifier);
+            colorAlpha = Mathf.Abs(lastBli.hitAngle) / HalfDetectionAngle;
             Handles.color = BoulderOnLeft
                 ? new Color(1, 0, 0, colorAlpha)
                 : new Color(1, .5f, 0, colorAlpha);
@@ -119,8 +121,7 @@ public class Other_BoulderDetector : MonoBehaviour
 
         var forward = transform.forward;
         var up = transform.up;
-        var position = transform.position + Height / 2 * transform.up;
-        if (Physics.Raycast(position, Vector3.down, out var hitInfo, Height)) //TODO check for ground tag?
+        if (Physics.Raycast(Position, Vector3.down, out var hitInfo, Height * 1.2f)) //TODO check for ground tag?
         {
             up = hitInfo.normal;
             var angle = -Mathf.Abs(90f - Vector3.Angle(forward, up));
@@ -128,10 +129,10 @@ public class Other_BoulderDetector : MonoBehaviour
         }
 
         var detectionAngleHalf = DetectionAngle / 2f;
-        Handles.DrawSolidArc(position, up, forward, detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(position, up, forward, -detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(position, transform.right, forward, -detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(position, transform.right, forward, detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(Position, up, forward, detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(Position, up, forward, -detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(Position, transform.right, forward, -detectionAngleHalf, DetectionRadius);
+        Handles.DrawSolidArc(Position, transform.right, forward, detectionAngleHalf, DetectionRadius);
 
         if (!boulder.IsUnityNull())
         {

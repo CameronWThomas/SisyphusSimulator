@@ -1,13 +1,5 @@
-﻿using Assets.Scripts.BoulderStuff;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
@@ -19,15 +11,12 @@ namespace Assets.Scripts.MovementStates
         public float slowDownModifer = 10f;
         public float maxSpeed = 5f;
 
-        private Rigidbody rb;
+        [Range(0f, 2f)]
+        public float boulderMovementPreventionDistance = 1f;
 
         public override MovementState ApplicableMovementState => MovementState.OnFoot;
 
-        protected override void Start()
-        {
-            base.Start();
-            rb = GetComponent<Rigidbody>();
-        }
+        private float boulderRadius => boulderTransform.GetComponent<SphereCollider>().radius;
 
         void Update()
         {
@@ -35,16 +24,16 @@ namespace Assets.Scripts.MovementStates
             animator.SetFloat("speedPercent", rb.velocity.magnitude / maxSpeed);
         }
 
-        public override void OnEnabled()
+        public override void Enable()
         {
-            base.OnEnabled();
-
+            base.Enable();
             animator.SetBool("pushing", false);
         }
 
         void FixedUpdate()
         {
-            if (moveDir != Vector3.zero)
+            lastMoveDir = Vector3.zero;
+            if (inputMoveDir != Vector3.zero)
             {
                 Move();
                 Rotate();
@@ -53,7 +42,7 @@ namespace Assets.Scripts.MovementStates
             {
                 SlowDown();
             }
-        }        
+        }
 
         private void Move()
         {
@@ -63,13 +52,21 @@ namespace Assets.Scripts.MovementStates
                 return;
             }
 
+            // If close to the boulder, prevent force being applied in the direction of the boulder so it is unmovable
+            if ((boulderTransform.position - Position).magnitude < boulderRadius + boulderMovementPreventionDistance)
+            {
+                var toBoulderDirection = (boulderTransform.position - Position).normalized;
+                var toBoulderMagnitude = Vector3.Dot(toBoulderDirection, correctedMoveDir);
+                correctedMoveDir -= toBoulderMagnitude * 2f * toBoulderDirection;
+            }
+
+            lastMoveDir = correctedMoveDir;
             rb.AddForce(50 * rb.mass * forceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
 
             if (rb.velocity.magnitude > maxSpeed)
             {
                 rb.velocity =  rb.velocity.normalized * maxSpeed;
             }
-
         }
 
         private void SlowDown()
@@ -86,94 +83,9 @@ namespace Assets.Scripts.MovementStates
 
         private void Rotate()
         {
-            var lookRotation = Quaternion.LookRotation(moveDir);
+            var lookRotation = Quaternion.LookRotation(inputMoveDir);
             var targetRotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.fixedDeltaTime * 5 * 180);
             transform.rotation = targetRotation;
         }
     }
 }
-
-//public class OnFootMovementController : MovementController
-//{
-
-//    //Jumping shit
-//    public float jumpHeight = 5;
-
-//    public float jumpTimer = 0f;
-//    float jumpTime = 0.5f;
-//    public float targetedYVelocity = 0f;
-
-//    public override void Move(UnityEngine.Vector2 inputDir)
-//    {
-//        float baseSpeed = moveSpeed;
-//        float targetSpeed = baseSpeed * inputDir.magnitude;
-//        currentSpeed = Mathf.SmoothStep(currentSpeed, targetSpeed, speedStepMultiplier * Time.deltaTime);
-
-//        animator.speedPercent = currentSpeed / moveSpeed;
-
-//        float moveAmount = Mathf.Abs(inputDir.x) + Mathf.Abs(inputDir.y);
-//        var moveInput = (new Vector3(inputDir.x, 0, inputDir.y)).normalized;
-//        var moveDir = cameraController.PlanarRotation2 * moveInput;
-//        //var moveDir = Quaternion.Euler(cameraController.transform.forward) * moveInput;
-//        //var moveDir = cameraController.fwd.normalized + moveInput;
-
-//        //falling
-//        if (isGrounded && !isJumping)
-//        {
-//            velocityY = -0.5f;
-//        }
-//        else
-//        {
-//            velocityY += Time.deltaTime * Physics.gravity.y;
-//        }
-
-//        var velocity = moveDir * currentSpeed;
-//        velocity.y = velocityY;
-
-
-
-
-//        controller.Move(velocity * Time.deltaTime);
-
-//        if (moveAmount > 0)
-//        {
-//            targetRotation = Quaternion.LookRotation(moveDir);
-//            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
-//            //targetRotation.y = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraT.eulerAngles.y;
-
-//        }
-//    }
-
-//    public override void Jump()
-//    {
-//        float effectiveHeight = (jumpHeight / (Physics.gravity.y / -2));
-
-//        if (isGrounded)
-//        {
-//            SetIsGrounded(false);
-
-
-//            SetIsJumping(true);
-//            animator.SetJumping(true);
-//            float jumpVelocity = Mathf.Sqrt(-2 * Physics.gravity.y * effectiveHeight);
-//            velocityY = jumpVelocity;
-//            targetedYVelocity = effectiveHeight;
-
-//        }
-
-//    }
-
-//    public override void StateEntered()
-//    {
-//        cameraController.SetWalkingCamera();
-
-//        animator.SetPushing(false);
-//        controller.enabled = true;
-//        Collider myCollider = GetComponent<Collider>();
-//        myCollider.enabled = true;
-//        //controller.transform.parent = null;
-//    }
-
-
-
-//}
