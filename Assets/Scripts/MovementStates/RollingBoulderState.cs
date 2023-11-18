@@ -9,7 +9,7 @@ using UnityEngine.ProBuilder.Shapes;
 
 namespace Assets.Scripts.MovementStates
 {
-    public class RollingBoulderState : MovementState
+    public class RollingBoulderState : MovementStateOther
     {
         private Vector3 activeForce;
         public float forceMultiplier = 15f;
@@ -23,7 +23,7 @@ namespace Assets.Scripts.MovementStates
         public float targetDistance = Mathf.Infinity;
         public Vector3 targetDirection = Vector3.zero;
 
-        MovementStateController msc;
+        private BoulderDetector.BoulderMovementInfo boulderMI => GetComponent<BoulderDetector>().boulderMovementInfo;
 
         Vector2 inputDirIntercept;
         private void Start()
@@ -54,7 +54,7 @@ namespace Assets.Scripts.MovementStates
             animator.speedPercent = 0f;
             float baseSpeed = moveSpeed;
             float targetSpeed = baseSpeed * inputDir.magnitude;
-            currentSpeed = Mathf.SmoothStep(currentSpeed, targetSpeed, speedStepMultiplier * Time.deltaTime);
+            currentSpeed = Mathf.SmoothStep(currentSpeed, targetSpeed, speedStepMultiplier * Time.fixedDeltaTime);
             animator.speedPercent = currentSpeed / moveSpeed;
 
             //falling
@@ -64,23 +64,32 @@ namespace Assets.Scripts.MovementStates
             }
             else
             {
-                velocityY += Time.deltaTime * Physics.gravity.y;
+                velocityY += Time.fixedDeltaTime * Physics.gravity.y;
             }
 
             //apply gravity
             Vector3 grav = Vector3.zero;
             grav.y = velocityY;
-            controller.Move(grav * Time.deltaTime);
+            controller.Move(grav * Time.fixedDeltaTime);
 
-
-            if (moveDir != Vector3.zero)
+            if (boulderMI.IsPushing)
             {
-                targetPosition = boulderFollower.transform.position + (moveDir.normalized) * -boulderFollower.rotateRadius;
+                var direction = (transform.position - boulderFollower.transform.position).normalized;
+                targetPosition = boulderFollower.transform.position + direction * boulderFollower.rotateRadius;
                 targetDirection = targetPosition - transform.position;
                 //targetPosition = GetTargetPosition(targetDirection);
                 //targetPosition = GetTargetPosition((moveDir.normalized) * -1);
                 MoveTowardsTarget(targetPosition);
             }
+
+            //if (moveDir != Vector3.zero)
+            //{
+            //    targetPosition = boulderFollower.transform.position + (moveDir.normalized) * -boulderFollower.rotateRadius;
+            //    targetDirection = targetPosition - transform.position;
+            //    //targetPosition = GetTargetPosition(targetDirection);
+            //    //targetPosition = GetTargetPosition((moveDir.normalized) * -1);
+            //    MoveTowardsTarget(targetPosition);
+            //}
 
             if (targetDistance <= pushDistance)
             {
@@ -92,7 +101,7 @@ namespace Assets.Scripts.MovementStates
                 if (moveDir != Vector3.zero)
                 {
                     targetRotation = Quaternion.LookRotation(moveDir);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.fixedDeltaTime);
                 }
             }
             else 
@@ -100,7 +109,7 @@ namespace Assets.Scripts.MovementStates
 
                 animator.SetPushing(false);
                 targetRotation = Quaternion.LookRotation(targetDirection);
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, 10f * Time.fixedDeltaTime);
                  
                 
             }
@@ -123,8 +132,10 @@ namespace Assets.Scripts.MovementStates
                 //If we're further away than .1 unit, move towards the target.
                 //The minimum allowable tolerance varies with the speed of the object and the framerate. 
                 // 2 * tolerance must be >= moveSpeed / framerate or the object will jump right over the stop.
-                targetDirection = targetDirection.normalized * currentSpeed;
+                //targetDirection = targetDirection.normalized * currentSpeed;
+                targetDirection = targetDirection.normalized;
                 //normalize it and account for movement speed.
+                Debug.Log($"Moving:{targetDirection * Time.deltaTime} target={target}");
                 controller.Move(targetDirection * Time.deltaTime);
                 //actually move the character.
             }
@@ -167,12 +178,12 @@ namespace Assets.Scripts.MovementStates
             Vector3 myPosition = transform.position;
 
             targetPos = new Vector3(targetPos.x, targetPos.y + heightOffset, targetPos.z);
-            transform.position = Vector3.Slerp(transform.position, targetPos, Time.deltaTime * rotateSpeed);
-            //transform.position = Vector3.RotateTowards(transform.position, targetPos, Time.deltaTime * rotateSpeed, 0f);
+            transform.position = Vector3.Slerp(transform.position, targetPos, Time.fixedDeltaTime * rotateSpeed);
+            //transform.position = Vector3.RotateTowards(transform.position, targetPos, Time.fixedDeltaTime * rotateSpeed, 0f);
 
         }
 
-        
+
         public override void StateEntered()
         {
             cameraController.SetRollingCamera();
@@ -191,11 +202,16 @@ namespace Assets.Scripts.MovementStates
 
         public void CheckDetach()
         {
-            float dist = Vector3.Distance(transform.position, boulderFollower.transform.position);
-            if(dist > boulderFollower.detachDistance)
+            if (!boulderMI.IsPushing)
             {
-                msc.SwitchState();
+                msc.ChangeState(msc.onFoot);
             }
+
+            //float dist = Vector3.Distance(transform.position, boulderFollower.transform.position);
+            //if(dist > boulderFollower.detachDistance)
+            //{
+            //    msc.SwitchState();
+            //}
         }
 
 

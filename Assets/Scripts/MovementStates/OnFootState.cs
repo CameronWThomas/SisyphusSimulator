@@ -12,7 +12,7 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace Assets.Scripts.MovementStates
 {
-    public class OnFootState : MovementState
+    public class OnFootState : MovementStateOther
     {
 
         //Jumping shit

@@ -12,7 +12,7 @@ namespace Assets.Scripts.BoulderStuff
     public class MovementStateController : MonoBehaviour
     {
         public Vector2 inputDir;
-        public MovementState currentState;
+        public MovementStateOther currentState;
 
         private CameraController cameraRef;
 
@@ -48,6 +48,7 @@ namespace Assets.Scripts.BoulderStuff
         private void Update()
         {
             GroundCheck();
+
             //currentState.UpdateState();
             if (currentState == onFoot)
             {
@@ -63,7 +64,7 @@ namespace Assets.Scripts.BoulderStuff
             }
         }
 
-        public void ChangeState(MovementState newState)
+        public void ChangeState(MovementStateOther newState)
         {
             if (currentState != null)
             {
@@ -106,7 +107,7 @@ namespace Assets.Scripts.BoulderStuff
 
     }
 
-    public abstract class MovementState : MonoBehaviour
+    public abstract class MovementStateOther : MonoBehaviour
     {
         GameObject gameObject { get; } 
         MonoBehaviour monoBehaviour { get; }
@@ -120,7 +121,7 @@ namespace Assets.Scripts.BoulderStuff
         public float speedStepMultiplier = 30f;
         public float moveSpeed = 10f;
         public UnityEngine.Quaternion targetRotation;
-        MovementStateController msc;
+        protected MovementStateController msc;
 
         public float velocityY;
         public bool isGrounded => msc.isGrounded;

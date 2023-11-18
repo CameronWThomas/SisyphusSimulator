@@ -100,7 +100,7 @@ namespace Assets.Scripts
         void OnInteractEnd(InputAction.CallbackContext context)
         {
             //TODO: increase Complexity
-            mc.SwitchState();
+            //mc.SwitchState();
         }
 
         private void OnDisable()
