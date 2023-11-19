@@ -22,6 +22,15 @@ namespace Assets.Scripts.MovementStates
         public float minResistiveForceApproachSpeed = .1f;
         public float resistiveForceModifer = 5f;
 
+        [Range(0f, 1f)]
+        public float catchUpSpeedIncrease = .2f;
+        [Range(0f, 1f)]
+        public float catchUpSpeedDecrease = .5f;
+        [Range(0f, 1f)]
+        public float distanceMin = .5f;
+        [Range(0f, 1f)]
+        public float distanceMax = .75f;
+
 
         public override MovementState ApplicableMovementState => MovementState.Pushing;
 
@@ -56,6 +65,7 @@ namespace Assets.Scripts.MovementStates
                 Move();
                 Rotate();
             }
+            //TODO have something where the player tries to catch up if not moving
         }
 
         private void BoulderCorrection()
@@ -83,7 +93,7 @@ namespace Assets.Scripts.MovementStates
             var force = resistiveForceModifer * boulderDetector.Resistance;
             boulderRb.AddForce(force, ForceMode.Impulse);
             rb.AddForce(-force / 10f, ForceMode.Impulse);
-        }
+        }        
 
         private void Move()
         {
@@ -93,14 +103,44 @@ namespace Assets.Scripts.MovementStates
                 return;
             }
 
-            lastMoveDir = correctedMoveDir;
             boulderRb.AddForce(constantForceModifier * boulderRb.mass * moveForceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
-
-            rb.velocity = boulderRb.velocity;
-            if (rb.velocity.magnitude > MaxSpeed)
+            var goingDown = boulderRb.velocity.y < 0;
+            var speedCheckVelocity = goingDown
+                ? new Vector3(boulderRb.velocity.x, 0f, boulderRb.velocity.z)
+                : boulderRb.velocity;
+            if (speedCheckVelocity.magnitude > MaxSpeed)
             {
-                rb.velocity = rb.velocity.normalized * MaxSpeed;
+                speedCheckVelocity.Normalize();
+                speedCheckVelocity *= MaxSpeed;
+                boulderRb.velocity = goingDown
+                    ? new Vector3(speedCheckVelocity.x, boulderRb.velocity.y, speedCheckVelocity.z)
+                    : speedCheckVelocity;
             }
+
+            var playerMoveDir = GetCorrectedMoveDir(Position);
+            if (playerMoveDir == Vector3.zero)
+            {
+                return;
+            }
+
+            var distance = (boulderTransform.position - Position).magnitude;
+            var power = boulderRb.velocity.magnitude;
+            if (distance > BoulderRadius + (boulderDetector.DetectionRadius * distanceMax))
+            {
+                power *= 1f + catchUpSpeedIncrease;
+            }
+            else if (distance < BoulderRadius + (boulderDetector.DetectionRadius * distanceMin)) 
+            {
+                power *= 1f - catchUpSpeedDecrease;
+            }
+            rb.velocity = power * playerMoveDir;
+
+            lastMoveDir = playerMoveDir;
+
+            //if (rb.velocity.magnitude > MaxSpeed)
+            //{
+            //    rb.velocity = rb.velocity.normalized * MaxSpeed;
+            //}
         }
 
         //TODO move to base

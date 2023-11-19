@@ -86,6 +86,9 @@ namespace Assets.Scripts.BoulderStuff
 
         private void OnCollisionEnter(Collision collision)
         {
+            //TODO a lot of how the force of impact can be improved. Partly based on real physics but a bit jank.
+            //TODO this should happen with anything, not just the boulder (long falls basically)
+
             if (!collision.transform.CompareTag("Boulder") && CurrentMovementState != MovementState.Ragdolling)
             {
                 return;
@@ -101,7 +104,7 @@ namespace Assets.Scripts.BoulderStuff
                 return;
             }
 
-            var impactFactor = (boulderRb.mass * (magitudeVelocity / Time.fixedDeltaTime)) / rb.mass;
+            var impactFactor = ((boulderRb.mass / 2f) * (magitudeVelocity / Time.fixedDeltaTime)) / rb.mass;
             Debug.Log($"impactFactor={impactFactor}");
             if (impactFactor > ragdollActivationFactor)
             {

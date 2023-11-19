@@ -6,9 +6,15 @@ using UnityEngine;
 public class Other_BoulderDetector : MonoBehaviour
 {
     [Range(0f, 180f)]
-    public float DetectionAngle = 90f;
+    public float detectionAngle = 90f;
     [Range(0f, 10f)]
-    public float DetectionRadius = 1.5f;
+    public float startingDetectionRadius = 1.5f;
+    [Range(0f, 1f)]
+    public float scalingEffect = .5f;
+
+    public float DetectionRadius => startingDetectionRadius * Mathf.Max(scaleSize * scalingEffect, 1f);
+
+    private float scaleSize => boulder.GetComponent<BoulderScaleAdjuster>().scaleSize;
 
     //TODO have some buffer where the left hand can be used with the boulder on the right if it is within a small degree
 
@@ -24,7 +30,7 @@ public class Other_BoulderDetector : MonoBehaviour
     private BoulderLocationInfo lastBli;
     private float Height => GetComponent<CapsuleCollider>().height;
     private Vector3 Position => transform.position + Height / 2 * transform.up;
-    private float HalfDetectionAngle => DetectionAngle / 2f;
+    private float HalfDetectionAngle => detectionAngle / 2f;
 
     void Start()
     {
@@ -130,11 +136,16 @@ public class Other_BoulderDetector : MonoBehaviour
             forward = Quaternion.Euler(angle, 0f, 0f) * forward;
         }
 
-        var detectionAngleHalf = DetectionAngle / 2f;
-        Handles.DrawSolidArc(Position, up, forward, detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(Position, up, forward, -detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(Position, transform.right, forward, -detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(Position, transform.right, forward, detectionAngleHalf, DetectionRadius);
+        var detectionAngleHalf = detectionAngle / 2f;
+        var radius = startingDetectionRadius;
+        if (!boulder.IsUnityNull())
+        {
+            radius = DetectionRadius;
+        }
+        Handles.DrawSolidArc(Position, up, forward, detectionAngleHalf, radius);
+        Handles.DrawSolidArc(Position, up, forward, -detectionAngleHalf, radius);
+        Handles.DrawSolidArc(Position, transform.right, forward, -detectionAngleHalf, radius);
+        Handles.DrawSolidArc(Position, transform.right, forward, detectionAngleHalf, radius);
 
         if (!boulder.IsUnityNull())
         {

@@ -63,9 +63,19 @@ namespace Assets.Scripts.MovementStates
             lastMoveDir = correctedMoveDir;
             rb.AddForce(50 * rb.mass * forceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
 
-            if (rb.velocity.magnitude > MaxSpeed)
+            // Sets max speed taking into account if you are falling (hopefully...)
+            //TODO used by bolder movement controller so should be put in base class
+            var goingDown = rb.velocity.y < 0f;
+            var speedCheckVelocity = goingDown 
+                ? new Vector3(rb.velocity.x, 0f, rb.velocity.z)
+                : rb.velocity;
+            if (speedCheckVelocity.magnitude > MaxSpeed)
             {
-                rb.velocity =  rb.velocity.normalized * MaxSpeed;
+                speedCheckVelocity.Normalize();
+                speedCheckVelocity *= MaxSpeed;
+                rb.velocity = goingDown
+                    ? new Vector3(speedCheckVelocity.x, rb.velocity.y, speedCheckVelocity.z)
+                    : speedCheckVelocity;
             }
         }
 
