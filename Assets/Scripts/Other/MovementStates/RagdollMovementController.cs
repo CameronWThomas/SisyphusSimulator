@@ -27,7 +27,7 @@ namespace Assets.Scripts.MovementStates
         float? timeOfEvent = null;
         float? TimePassed => timeOfEvent is null ? null : Time.time - timeOfEvent;
 
-        bool IsStill => rb.velocity.magnitude < 0.001f;
+        bool IsStill => root.velocity.magnitude < 0.01f;
 
         public override MovementState ApplicableMovementState => MovementState.Ragdolling;
 
