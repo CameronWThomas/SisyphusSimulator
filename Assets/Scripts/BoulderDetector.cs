@@ -13,12 +13,10 @@ namespace Assets.Scripts
         public float startingDetectionRadius = 1.5f;
         [Range(0f, 1f)]
         public float scalingEffect = .5f;
+        [Range(0f, 1f)]
+        public float handOverlap = .1f;
 
         public float DetectionRadius => startingDetectionRadius * Mathf.Max(scaleSize * scalingEffect, 1f);
-
-        private float scaleSize => boulder.GetComponent<BoulderScaleAdjuster>().scaleSize;
-
-        //TODO have some buffer where the left hand can be used with the boulder on the right if it is within a small degree
 
         public bool IsPushing { get; private set; }
         public bool BoulderOnLeft { get; private set; }
@@ -30,9 +28,11 @@ namespace Assets.Scripts
 
         private GameObject boulder;
         private BoulderLocationInfo lastBli;
+
         private float Height => GetComponent<CapsuleCollider>().height;
         private Vector3 Position => transform.position + Height / 2 * transform.up;
         private float HalfDetectionAngle => detectionAngle / 2f;
+        private float scaleSize => boulder.GetComponent<BoulderScaleAdjuster>().scaleSize;
 
         void Start()
         {
@@ -47,35 +47,39 @@ namespace Assets.Scripts
             lastBli = GetBoulderLocationInfo();
 
             //TODO I know this is wrong. Maybe use mouse clicks?
-            var leftHand = Input.GetKey(KeyCode.Q);
-            var rightHand = Input.GetKey(KeyCode.E);
-            UpdateProperties(lastBli, leftHand, rightHand);
+            LeftHand = Input.GetKey(KeyCode.Q);
+            RightHand = Input.GetKey(KeyCode.E);
+            UpdateProperties(lastBli);
         }
 
-        private void UpdateProperties(BoulderLocationInfo bli, bool leftHandPress, bool rightHandPress)
+        private void UpdateProperties(BoulderLocationInfo bli)
         {
             if (!bli.isInRange)
             {
                 IsPushing = false;
             }
 
+            // Make sure a hand is pressed that will work
             BoulderOnLeft = bli.hitAngle < 0;
-            IsPushing = bli.isInRange && ((BoulderOnLeft && leftHandPress) || (!BoulderOnLeft && rightHandPress));
+            var boulderWithinHandRange = BoulderOnLeft
+                ? LeftHand || (Mathf.Abs(bli.hitAngle) < HalfDetectionAngle * handOverlap && RightHand)
+                : RightHand || (Mathf.Abs(bli.hitAngle) < HalfDetectionAngle * handOverlap && LeftHand);
+            IsPushing = bli.isInRange && boulderWithinHandRange;
             if (!IsPushing)
             {
                 return;
             }
 
-            var sign = BoulderOnLeft ? 1 : -1;
+            // Figure out the correction strength
             var contactAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(bli.hitAngle) / HalfDetectionAngle);
-            CorrectionModifier = Mathf.Pow(contactAnglePercent, 1.5f) * sign;
-            LeftHand = leftHandPress;
-            RightHand = rightHandPress;
+            CorrectionModifier = Mathf.Pow(contactAnglePercent, 1.5f);
 
+            // Figure out the currently velocity in the correction direction
             var boulderRb = boulder.GetComponent<Rigidbody>();
             var localBoulderVelocity = transform.InverseTransformDirection(boulderRb.velocity);
             CorrectionVelocity = localBoulderVelocity.x;
 
+            // Figure out how strong of resistance to an oncoming boulder
             var approachSpeed = Vector3.Dot(-bli.toBoulderDirection, boulder.GetComponent<Rigidbody>().velocity);
             var approachingVelocity = approachSpeed <= 0 ? Vector3.zero : -1 * approachSpeed * bli.toBoulderDirection;
             Resistance = -1 * approachingVelocity;
@@ -87,17 +91,19 @@ namespace Assets.Scripts
             var boulderLocationInfo = new BoulderLocationInfo() { isInRange = false };
 
             var boulderDirection = (boulder.transform.position - Position).normalized;
-
             if (!Physics.Raycast(Position, boulderDirection, out var hitInfo, DetectionRadius) ||
                 hitInfo.transform.gameObject != boulder)
             {
+                // Boulder not close enough
                 return boulderLocationInfo;
             }
 
+            // Check if boulder is directly in view
             var hitDirection = (hitInfo.point - Position).normalized;
             var hitAngle = Vector3.SignedAngle(transform.forward, hitDirection, transform.up);
             if (Mathf.Abs(hitAngle) > HalfDetectionAngle)
             {
+                // Boulder out of view, but edge may still be, check
                 var rotation = hitAngle > 0
                     ? Quaternion.Euler(0, hitAngle - HalfDetectionAngle, 0)
                     : Quaternion.Euler(0, hitAngle + HalfDetectionAngle, 0);

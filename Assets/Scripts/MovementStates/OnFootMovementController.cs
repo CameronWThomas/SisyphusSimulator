@@ -17,7 +17,7 @@ namespace Assets.Scripts.MovementStates
 
         void Update()
         {
-            //TODO will need to set differently. Probably have something that is responsible for animation? maybe based on movement state?
+            //TODO Should use the SisyphusAnimator along with other uses. Will integrate with that later
             animator.SetFloat("speedPercent", rb.velocity.magnitude / MaxSpeed);
         }
 

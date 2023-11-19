@@ -11,9 +11,13 @@ namespace Assets.Scripts.MovementStates
         public float maxCorrectiveVelocity = .45f;
         public float correctionForceModifier = 4f;
         public float overcorrectionCounterStrength = 10f;
+        [Range(0f, 1f)]
+        public float correctionTwoHandLoss = .2f;
 
         public float minResistiveForceApproachSpeed = .1f;
         public float resistiveForceModifer = 5f;
+        [Range(0f, 1f)]
+        public float resistanceOneHandLoss = .2f;
 
         [Range(0f, 1f)]
         public float catchUpSpeedIncrease = .2f;
@@ -61,15 +65,30 @@ namespace Assets.Scripts.MovementStates
 
         private void BoulderCorrection()
         {
-            var movingAwayFromCenter = boulderDetector.CorrectionVelocity * boulderDetector.CorrectionModifier < 0f;
+            var movingAwayFromCenter = (boulderDetector.CorrectionVelocity < 0f && boulderDetector.BoulderOnLeft)
+                || (boulderDetector.CorrectionVelocity > 0f && !boulderDetector.BoulderOnLeft);
             if (!(movingAwayFromCenter || boulderDetector.CorrectionVelocity < maxCorrectiveVelocity))
             {
                 return;
             }
 
+            // We can overcorrect by moving the boulder too fast to the center and it moves fast on the other side. This fixes that
             var overCorrectionModifier = movingAwayFromCenter ? overcorrectionCounterStrength : 1f;
 
-            var correctionForce = overCorrectionModifier * correctionForceModifier * constantForceModifier * boulderDetector.CorrectionModifier * Time.fixedDeltaTime * transform.right;
+            // pos=right, neg=left
+            var sign = boulderDetector.BoulderOnLeft ? 1f : -1f;
+            var actualCorrectionForceModifier = (constantForceModifier * correctionForceModifier) * correctionTwoHandLoss;
+
+            // Correction strength depends on which hand is being used and how many
+            if (boulderDetector.LeftHand != boulderDetector.RightHand)
+            {
+                sign = boulderDetector.LeftHand ? 1f : -1f;
+                actualCorrectionForceModifier = constantForceModifier * correctionForceModifier;
+            }
+
+            var power = overCorrectionModifier * actualCorrectionForceModifier * constantForceModifier * boulderDetector.CorrectionModifier * Time.fixedDeltaTime;
+            var correctionForce = sign * power * transform.right;
+
             boulderRb.AddForce(correctionForce, ForceMode.Impulse);
         }
 
@@ -80,8 +99,13 @@ namespace Assets.Scripts.MovementStates
                 return;
             }
 
-            //boulderRb.AddForce(constantForceModifier * resistiveForceModifer * boulderDetector.Resistance, ForceMode.Impulse);
-            var force = resistiveForceModifer * boulderDetector.Resistance;
+            var force = resistiveForceModifer * boulderDetector.Resistance * (boulderRb.mass / 100f);
+            if (boulderDetector.LeftHand != boulderDetector.RightHand)
+            {
+                force *= resistanceOneHandLoss;
+            }
+
+            
             boulderRb.AddForce(force, ForceMode.Impulse);
             rb.AddForce(-force / 10f, ForceMode.Impulse);
         }        
@@ -94,7 +118,18 @@ namespace Assets.Scripts.MovementStates
                 return;
             }
 
-            boulderRb.AddForce(constantForceModifier * boulderRb.mass * moveForceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
+            var toBoulderDirection = (boulderTransform.position - transform.position).normalized;
+            var angle = Vector3.Angle(toBoulderDirection, correctedMoveDir.normalized);
+            //var force = Mathf.Abs(Mathf.Cos(angle)) * // TODO scale force based on the direction
+            var force =
+                constantForceModifier *
+                boulderRb.mass * 
+                moveForceModifier * 
+                Time.fixedDeltaTime * 
+                correctedMoveDir;
+
+            boulderRb.AddForce(force, ForceMode.Force);
+            
             var goingDown = boulderRb.velocity.y < 0;
             var speedCheckVelocity = goingDown
                 ? new Vector3(boulderRb.velocity.x, 0f, boulderRb.velocity.z)
@@ -127,11 +162,6 @@ namespace Assets.Scripts.MovementStates
             rb.velocity = power * playerMoveDir;
 
             lastMoveDir = playerMoveDir;
-
-            //if (rb.velocity.magnitude > MaxSpeed)
-            //{
-            //    rb.velocity = rb.velocity.normalized * MaxSpeed;
-            //}
         }
 
         //TODO move to base
