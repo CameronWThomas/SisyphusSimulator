@@ -1,12 +1,5 @@
-﻿using Assets.Scripts.BoulderStuff;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using UnityEngine;
-using UnityEngine.ProBuilder.Shapes;
-using static BoulderDetector;
 
 namespace Assets.Scripts.MovementStates
 {
@@ -31,11 +24,9 @@ namespace Assets.Scripts.MovementStates
         [Range(0f, 1f)]
         public float distanceMax = .75f;
 
-
         public override MovementState ApplicableMovementState => MovementState.Pushing;
 
-
-        private Other_BoulderDetector boulderDetector;
+        private BoulderDetector boulderDetector;
 
         public override void Enable()
         {
@@ -46,7 +37,7 @@ namespace Assets.Scripts.MovementStates
         protected override void Awake()
         {
             base.Awake();
-            boulderDetector = GetComponent<Other_BoulderDetector>();
+            boulderDetector = GetComponent<BoulderDetector>();
         }        
 
         void Update()

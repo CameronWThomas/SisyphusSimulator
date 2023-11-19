@@ -1,162 +1,168 @@
-using Assets.Scripts.BoulderStuff;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-public class BoulderDetector : MonoBehaviour
+namespace Assets.Scripts
 {
-    [Range(0f, 180f)]
-    public float DetectionAngle = 90f;
-    [Range(0f, 10f)]
-    public float DetectionRadius = 1.5f;
-
-    public bool IsInRange { get; private set; }
-    public bool BoulderOnLeft { get; private set; }
-    public float ContactAnglePercent { get; private set; }
-    public Vector3 ApproachingVelocity { get; private set; }
-
-    private GameObject m_Boulder;
-    private Rigidbody m_BoulderRb => m_Boulder.GetComponent<Rigidbody>();
-
-    private MovementStateController msc;
-
-    private float m_Height => GetComponent<CharacterController>().height;
-
-    // Start is called before the first frame update
-    void Start()
+    public class BoulderDetector : MonoBehaviour
     {
-        m_Boulder = GameObject.FindGameObjectsWithTag("Boulder").First();
-        msc = GetComponent<MovementStateController>();
-    }
+        [Range(0f, 180f)]
+        public float detectionAngle = 90f;
+        [Range(0f, 10f)]
+        public float startingDetectionRadius = 1.5f;
+        [Range(0f, 1f)]
+        public float scalingEffect = .5f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        UpdateProperties();
+        public float DetectionRadius => startingDetectionRadius * Mathf.Max(scaleSize * scalingEffect, 1f);
 
-        //TODO I know this is wrong
-        var leftHand = Input.GetKey(KeyCode.Q);
-        var rightHand = Input.GetKey(KeyCode.E);
-        UpdateBoulderMovementInfo(leftHand, rightHand);
+        private float scaleSize => boulder.GetComponent<BoulderScaleAdjuster>().scaleSize;
 
-        if (pushingChanged)
+        //TODO have some buffer where the left hand can be used with the boulder on the right if it is within a small degree
+
+        public bool IsPushing { get; private set; }
+        public bool BoulderOnLeft { get; private set; }
+        public bool LeftHand { get; private set; }
+        public bool RightHand { get; private set; }
+        public float CorrectionModifier { get; private set; }
+        public float CorrectionVelocity { get; private set; }
+        public Vector3 Resistance { get; private set; }
+
+        private GameObject boulder;
+        private BoulderLocationInfo lastBli;
+        private float Height => GetComponent<CapsuleCollider>().height;
+        private Vector3 Position => transform.position + Height / 2 * transform.up;
+        private float HalfDetectionAngle => detectionAngle / 2f;
+
+        void Start()
         {
-            msc.ChangeState(boulderMovementInfo.IsPushing ? msc.rolling : msc.onFoot);
-        }
-    }
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
-    private bool pushingChanged = false;
-
-    public BoulderMovementInfo boulderMovementInfo = new();
-    private void UpdateBoulderMovementInfo(bool leftHandPress, bool rightHandPress)
-    {
-        var isPushing = IsInRange
-            && ((BoulderOnLeft && leftHandPress) || (!BoulderOnLeft && rightHandPress));
-
-        pushingChanged = isPushing != boulderMovementInfo.IsPushing;
-        boulderMovementInfo.IsPushing = isPushing;
-
-
-        if (!boulderMovementInfo.IsPushing)
-        {
-            return;
+            boulder = GameObject.FindGameObjectsWithTag("Boulder").First();
         }
 
-        boulderMovementInfo.BoulderOnLeft = BoulderOnLeft;
-
-        var sign = BoulderOnLeft ? 1 : -1;
-        boulderMovementInfo.CorrectionModifier = Mathf.Pow(ContactAnglePercent, 1.5f) * sign;
-        boulderMovementInfo.LeftHand = leftHandPress;
-        boulderMovementInfo.RightHand = rightHandPress;
-
-        var localBoulderVelocity = transform.InverseTransformDirection(m_BoulderRb.velocity);
-        boulderMovementInfo.CorrectionVelocity = localBoulderVelocity.x;
-        boulderMovementInfo.Resistance = -1 * ApproachingVelocity;
-    }
-
-    public class BoulderMovementInfo
-    {
-        public bool IsPushing;
-        public float CorrectionModifier;
-        public bool BoulderOnLeft;
-        public bool LeftHand;
-        public bool RightHand;
-
-        public float CorrectionVelocity;
-        public Vector3 Resistance;
-    }
-
-    private void UpdateProperties()
-    { 
-        var boulderDirection = (m_Boulder.transform.position - transform.position).normalized;
-
-        if (!Physics.Raycast(transform.position, boulderDirection, out var hitInfo, DetectionRadius) ||
-            hitInfo.transform.gameObject != m_Boulder)
+        void FixedUpdate()
         {
-            IsInRange = false;
-            return;
+            lastBli = GetBoulderLocationInfo();
+
+            //TODO I know this is wrong. Maybe use mouse clicks?
+            var leftHand = Input.GetKey(KeyCode.Q);
+            var rightHand = Input.GetKey(KeyCode.E);
+            UpdateProperties(lastBli, leftHand, rightHand);
         }
 
-        var hitDirection = (hitInfo.point - transform.position).normalized;
-        var hitAngle = Vector3.SignedAngle(transform.forward, hitDirection, transform.up);
-        if (Mathf.Abs(hitAngle) > DetectionAngle / 2)
+        private void UpdateProperties(BoulderLocationInfo bli, bool leftHandPress, bool rightHandPress)
         {
-            var rotation = hitAngle > 0
-                ? Quaternion.Euler(0, hitAngle - DetectionAngle / 2, 0)
-                : Quaternion.Euler(0, hitAngle + DetectionAngle / 2, 0);
-            var raycastDirection = rotation * hitDirection;
-
-            if (!Physics.Raycast(transform.position, raycastDirection, out var secondHitInfo, DetectionRadius) ||
-                secondHitInfo.transform.gameObject != m_Boulder)
+            if (!bli.isInRange)
             {
-                IsInRange = false;
+                IsPushing = false;
+            }
+
+            BoulderOnLeft = bli.hitAngle < 0;
+            IsPushing = bli.isInRange && ((BoulderOnLeft && leftHandPress) || (!BoulderOnLeft && rightHandPress));
+            if (!IsPushing)
+            {
                 return;
             }
 
-            var secondHitDirection = (secondHitInfo.point - transform.position).normalized;
-            hitAngle = Vector3.SignedAngle(transform.forward, secondHitDirection, transform.up);
+            var sign = BoulderOnLeft ? 1 : -1;
+            var contactAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(bli.hitAngle) / HalfDetectionAngle);
+            CorrectionModifier = Mathf.Pow(contactAnglePercent, 1.5f) * sign;
+            LeftHand = leftHandPress;
+            RightHand = rightHandPress;
+
+            var boulderRb = boulder.GetComponent<Rigidbody>();
+            var localBoulderVelocity = transform.InverseTransformDirection(boulderRb.velocity);
+            CorrectionVelocity = localBoulderVelocity.x;
+
+            var approachSpeed = Vector3.Dot(-bli.toBoulderDirection, boulder.GetComponent<Rigidbody>().velocity);
+            var approachingVelocity = approachSpeed <= 0 ? Vector3.zero : -1 * approachSpeed * bli.toBoulderDirection;
+            Resistance = -1 * approachingVelocity;
         }
 
-        IsInRange = true;
-        BoulderOnLeft = hitAngle < 0;
-        ContactAnglePercent = Mathf.Lerp(0f, 1f, Mathf.Abs(hitAngle) / (DetectionAngle / 2));
-        var approachSpeed = Vector3.Dot(-boulderDirection, m_Boulder.GetComponent<Rigidbody>().velocity);
-        ApproachingVelocity = approachSpeed <= 0 ? Vector3.zero : -1 * approachSpeed * boulderDirection;
-    }
 
-    private void OnDrawGizmos()
-    {
-        var colorAlpha = .25f;
-
-        Handles.color = new Color(0, 0, 1, colorAlpha);
-        if (IsInRange)
+        private BoulderLocationInfo GetBoulderLocationInfo()
         {
-            colorAlpha = ContactAnglePercent;
-            Handles.color = BoulderOnLeft
-                ? new Color(1, 0, 0, colorAlpha)
-                : new Color(1, .5f, 0, colorAlpha);
+            var boulderLocationInfo = new BoulderLocationInfo() { isInRange = false };
+
+            var boulderDirection = (boulder.transform.position - Position).normalized;
+
+            if (!Physics.Raycast(Position, boulderDirection, out var hitInfo, DetectionRadius) ||
+                hitInfo.transform.gameObject != boulder)
+            {
+                return boulderLocationInfo;
+            }
+
+            var hitDirection = (hitInfo.point - Position).normalized;
+            var hitAngle = Vector3.SignedAngle(transform.forward, hitDirection, transform.up);
+            if (Mathf.Abs(hitAngle) > HalfDetectionAngle)
+            {
+                var rotation = hitAngle > 0
+                    ? Quaternion.Euler(0, hitAngle - HalfDetectionAngle, 0)
+                    : Quaternion.Euler(0, hitAngle + HalfDetectionAngle, 0);
+                var raycastDirection = rotation * hitDirection;
+
+                if (!Physics.Raycast(Position, raycastDirection, out var secondHitInfo, DetectionRadius) ||
+                    secondHitInfo.transform.gameObject != boulder)
+                {
+                    return boulderLocationInfo;
+                }
+
+                var secondHitDirection = (secondHitInfo.point - Position).normalized;
+                hitAngle = Vector3.SignedAngle(transform.forward, secondHitDirection, transform.up);
+            }
+
+            boulderLocationInfo.isInRange = true;
+            boulderLocationInfo.hitAngle = hitAngle;
+            boulderLocationInfo.toBoulderDirection = boulderDirection;
+            return boulderLocationInfo;
         }
 
-        var forward = transform.forward;
-        var up = transform.up;
-        var position = transform.position + m_Height / 2 * transform.up;
-        if (Physics.Raycast(position, Vector3.down, out var hitInfo, m_Height)) //TODO check for ground tag?
+        private void OnDrawGizmos()
         {
-            up = hitInfo.normal;
-            var angle = -Mathf.Abs(90f - Vector3.Angle(forward, up));
-            forward = Quaternion.Euler(angle, 0f, 0f) * forward;
+            var colorAlpha = .25f;
+
+            Handles.color = new Color(0, 0, 1, colorAlpha);
+            if (lastBli.isInRange)
+            {
+                colorAlpha = Mathf.Abs(lastBli.hitAngle) / HalfDetectionAngle;
+                Handles.color = BoulderOnLeft
+                    ? new Color(1, 0, 0, colorAlpha)
+                    : new Color(1, .5f, 0, colorAlpha);
+            }
+
+            var forward = transform.forward;
+            var up = transform.up;
+            if (Physics.Raycast(Position, Vector3.down, out var hitInfo, Height * 1.2f)) //TODO check for ground tag?
+            {
+                up = hitInfo.normal;
+                var angle = -Mathf.Abs(90f - Vector3.Angle(forward, up));
+                forward = Quaternion.Euler(angle, 0f, 0f) * forward;
+            }
+
+            var detectionAngleHalf = detectionAngle / 2f;
+            var radius = startingDetectionRadius;
+            if (!boulder.IsUnityNull())
+            {
+                radius = DetectionRadius;
+            }
+            Handles.DrawSolidArc(Position, up, forward, detectionAngleHalf, radius);
+            Handles.DrawSolidArc(Position, up, forward, -detectionAngleHalf, radius);
+            Handles.DrawSolidArc(Position, transform.right, forward, -detectionAngleHalf, radius);
+            Handles.DrawSolidArc(Position, transform.right, forward, detectionAngleHalf, radius);
+
+            if (!boulder.IsUnityNull())
+            {
+                Handles.DrawLine(boulder.transform.position, boulder.transform.position + -Resistance, 4f);
+            }
         }
 
-        var detectionAngleHalf = DetectionAngle / 2f;
-        Handles.DrawSolidArc(position, up, forward, detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(position, up, forward, -detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(position, transform.right, forward, -detectionAngleHalf, DetectionRadius);
-        Handles.DrawSolidArc(position, transform.right, forward, detectionAngleHalf, DetectionRadius);
-
-        if (!m_Boulder.IsUnityNull())
+        private struct BoulderLocationInfo
         {
-            Handles.DrawLine(m_Boulder.transform.position, m_Boulder.transform.position + ApproachingVelocity, 4f);
+            public bool isInRange;
+            public float hitAngle;
+            public Vector3 toBoulderDirection;
         }
     }
 }

@@ -23,8 +23,7 @@ public class SisyphusAnimator : MonoBehaviour
         animator.SetFloat("speedPercent", speedPercent);
 
         //grounded checker
-        animator.SetBool("isGrounded", movementStateController.isGrounded); 
-
+        animator.SetBool("isGrounded", true); 
     }
 
     public void SetPushing(bool pushing)

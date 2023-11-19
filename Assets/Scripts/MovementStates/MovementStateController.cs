@@ -1,163 +1,114 @@
 ﻿using Assets.Scripts.MovementStates;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Assets.Scripts.BoulderStuff
 {
     public class MovementStateController : MonoBehaviour
     {
-        public Vector2 inputDir;
-        public MovementStateOther currentState;
+        public float maxSpeed = 5f;
+        public float ragdollActivationFactor = 1250f;
+        public float ragdollImpactMitigation = 100f;
+
+        private Vector3 moveDir;
 
         private CameraController cameraRef;
+        private MovementController[] movementControllers;
+        private MovementController currentMovementController;
+        private BoulderDetector boulderDetector;
+        private Rigidbody rb;
+        private Vector3 lastVelocity;
 
-        CharacterController playerController;
-        public Rigidbody boulderRb;
-        public Boulder boulder;
-
-
-        [SerializeField] Vector3 groundCheckOffset;
-        [SerializeField] LayerMask groundCheckLayerMask;
-        [SerializeField] float groundCheckRadius = 0.2f;
-
-
-        public OnFootState onFoot;
-        public RollingBoulderState rolling;
-
-        public bool isGrounded = false;
-        public bool isJumping = false;
+        private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
+        
         private void Start()
         {
-            playerController = GetComponent<CharacterController>();
-            cameraRef = GameObject.FindObjectOfType<CameraController>();
+            cameraRef = FindObjectOfType<CameraController>();
+            movementControllers = GetComponents<MovementController>();
+            boulderDetector = GetComponent<BoulderDetector>();
+            rb = GetComponent<Rigidbody>();
 
-            onFoot = GetComponent<OnFootState>();
-            rolling = GetComponent<RollingBoulderState>();
+            foreach (var movementController in movementControllers)
+            {
+                movementController.Disable();
+                movementController.MaxSpeed = maxSpeed;
+            }
 
-            boulder = FindObjectOfType<Boulder>();
-            boulderRb = boulder.GetComponent<Rigidbody>();
-            
-
-            ChangeState(onFoot);
+            currentMovementController = movementControllers.First(x => x.ApplicableMovementState == MovementState.OnFoot);
+            currentMovementController.Enable();
         }
+
         private void Update()
         {
-            GroundCheck();
+            var input = GetComponent<PlayerInputBus>().moveInput;
+            moveDir = (new Vector3(input.x, 0, input.y).normalized) * input.magnitude;
+            moveDir = cameraRef.PlanarRotation2 * moveDir;
 
-            //currentState.UpdateState();
-            if (currentState == onFoot)
-            {
-                currentState.Move(inputDir);
-            }
-        }
-        private void FixedUpdate()
-        {
+            currentMovementController.inputMoveDir = moveDir;
 
-            if (currentState == rolling)
+            MovementState newState = CurrentMovementState;
+            if (Input.GetKeyDown(KeyCode.R) && CurrentMovementState != MovementState.Ragdolling)
             {
-                currentState.Move(inputDir);
+                newState = MovementState.Ragdolling;
             }
-        }
+            else if (CurrentMovementState != MovementState.Ragdolling)
+            {
+                newState = boulderDetector.IsPushing ? MovementState.Pushing : MovementState.OnFoot;
+            }
 
-        public void ChangeState(MovementStateOther newState)
-        {
-            if (currentState != null)
+            if (newState != CurrentMovementState)
             {
-                currentState.OnExit();
-            }
-            currentState = newState;
-            currentState.enabled = true;
-            currentState.OnEnter(playerController, boulderRb, cameraRef);
-        }
-
-        public void SwitchState()
-        {
-            if(currentState == onFoot)
-            {
-                ChangeState(rolling);
-            }
-            else
-            {
-                ChangeState(onFoot);
+                ChangeState(newState);
             }
         }
 
-        public void GroundCheck()
+        private void LateUpdate()
         {
-            Vector3 checkPos = transform.TransformPoint(groundCheckOffset);
-            isGrounded = Physics.CheckSphere(checkPos, groundCheckRadius, groundCheckLayerMask);
+            lastVelocity = rb.velocity;
         }
 
-        public void Jump()
+        public void ChangeState(MovementState newState)
         {
-            currentState.Jump();
+            if (currentMovementController.ApplicableMovementState == newState)
+            {
+                return;
+            }
+
+            // Activate new state and deactivate other
+            currentMovementController.Disable();
+            currentMovementController = movementControllers.First(x => x.ApplicableMovementState == newState);
+            currentMovementController.Enable();
+
+            currentMovementController.inputMoveDir = moveDir;
         }
-        //private void OnDrawGizmos()
-        //{
-        //    //Drawing the ground checker
-        //    Vector3 checkPos = transform.TransformPoint(groundCheckOffset);
-        //    Gizmos.color = Color.yellow;
-        //    Gizmos.DrawSphere(checkPos, groundCheckRadius);
-        //}
 
-    }
-
-    public abstract class MovementStateOther : MonoBehaviour
-    {
-        GameObject gameObject { get; } 
-        MonoBehaviour monoBehaviour { get; }
-        public SisyphusAnimator animator;
-        public CharacterController controller;
-        public CameraController cameraController;
-        public Rigidbody rb;
-
-
-        public float currentSpeed;
-        public float speedStepMultiplier = 30f;
-        public float moveSpeed = 10f;
-        public UnityEngine.Quaternion targetRotation;
-        protected MovementStateController msc;
-
-        public float velocityY;
-        public bool isGrounded => msc.isGrounded;
-        public bool isJumping => msc.isJumping;
-
-        public void SetIsGrounded(bool g)
+        private void OnCollisionEnter(Collision collision)
         {
-            msc.isGrounded = g;
-        }
-        public void SetIsJumping(bool j)
-        {
-            msc.isJumping = j;
-        }
-        //must not start active
-        private void Awake()
-        {
-            enabled = false;
-            animator = GetComponent<SisyphusAnimator>();
-            msc = GetComponent<MovementStateController>();
-        }
-        public void OnEnter(CharacterController me, Rigidbody boulder, CameraController camera)
-        {
-            controller = me;
-            rb = boulder;
-            cameraController = camera;
-            StateEntered();
-        }
-        public abstract void Jump();
-        public void OnExit()
-        {
-            this.enabled = false;
-        }
-        public abstract void StateEntered();
-        public abstract void Move(Vector2 inputDir);
+            //TODO a lot of how the force of impact can be improved. Partly based on real physics but a bit jank.
+            //TODO this should happen with anything, not just the boulder (long falls basically)
 
+            if (!collision.transform.CompareTag("Boulder") && CurrentMovementState != MovementState.Ragdolling)
+            {
+                return;
+            }
 
-        
+            var boulderTransform = collision.transform;
+            var boulderRb = boulderTransform.GetComponent<Rigidbody>();
+            
+            var boulderToDirection = (currentMovementController.Position - boulderTransform.position).normalized;
+            var magitudeVelocity = Vector3.Dot(boulderRb.velocity - lastVelocity, boulderToDirection);
+            if (magitudeVelocity < 0f)
+            {
+                return;
+            }
+
+            var impactFactor = ((boulderRb.mass / 2f) * (magitudeVelocity / Time.fixedDeltaTime)) / rb.mass;
+            Debug.Log($"impactFactor={impactFactor}");
+            if (impactFactor > ragdollActivationFactor)
+            {
+                ChangeState(MovementState.Ragdolling);
+                currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
+            }
+        }
     }
 }
