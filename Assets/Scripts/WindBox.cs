@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts
 {
@@ -18,6 +20,16 @@ namespace Assets.Scripts
         private void OnEnable()
         {
             boxCollider = GetComponent<BoxCollider>();
+
+            Rigidbody[] allRbs = FindObjectsOfType<Rigidbody>();
+            
+            foreach(Rigidbody rb in allRbs)
+            {
+                if (boxCollider.bounds.Contains(rb.transform.position))
+                {
+                    rbList.Add(rb);
+                }
+            }
         }
         private void Update()
         {
