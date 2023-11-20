@@ -20,8 +20,8 @@ namespace Assets.Scripts
 
         public bool IsPushing { get; private set; }
         public bool BoulderOnLeft { get; private set; }
-        public bool LeftHand { get; private set; }
-        public bool RightHand { get; private set; }
+        public bool LeftHand { get; set; }
+        public bool RightHand { get; set; }
         public float CorrectionModifier { get; private set; }
         public float CorrectionVelocity { get; private set; }
         public Vector3 Resistance { get; private set; }
@@ -47,8 +47,8 @@ namespace Assets.Scripts
             lastBli = GetBoulderLocationInfo();
 
             //TODO I know this is wrong. Maybe use mouse clicks?
-            LeftHand = Input.GetKey(KeyCode.Q);
-            RightHand = Input.GetKey(KeyCode.E);
+            //LeftHand = Input.GetKey(KeyCode.Q);
+            //RightHand = Input.GetKey(KeyCode.E);
             UpdateProperties(lastBli);
         }
 

@@ -71,6 +71,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftPush"",
+                    ""type"": ""Button"",
+                    ""id"": ""6b1c2986-e761-40e4-9356-624cf34f553e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightPush"",
+                    ""type"": ""Button"",
+                    ""id"": ""f9feacb1-cbe6-44c7-be62-567de5c8dac9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -227,6 +245,72 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a81465df-8b11-4d5f-a3b5-24ab46fa439d"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""LeftPush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8b76aabd-3def-45d9-a5d1-76d496ab3775"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""LeftPush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""901b0cbb-053d-4850-8248-de344b4b238d"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""LeftPush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cc786e54-63a6-40d2-9263-cef3de2c5a25"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""RightPush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""23ecdbb5-cb0f-4a70-9149-b86599833887"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""RightPush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e627779c-d4de-4fd7-8bb4-0dcd16648e0a"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Default"",
+                    ""action"": ""RightPush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -246,6 +330,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_TestToggleRagdoll = m_Player.FindAction("TestToggleRagdoll", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_LeftPush = m_Player.FindAction("LeftPush", throwIfNotFound: true);
+        m_Player_RightPush = m_Player.FindAction("RightPush", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -312,6 +398,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_TestToggleRagdoll;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_LeftPush;
+    private readonly InputAction m_Player_RightPush;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -321,6 +409,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
         public InputAction @TestToggleRagdoll => m_Wrapper.m_Player_TestToggleRagdoll;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @LeftPush => m_Wrapper.m_Player_LeftPush;
+        public InputAction @RightPush => m_Wrapper.m_Player_RightPush;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -345,6 +435,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @LeftPush.started += instance.OnLeftPush;
+            @LeftPush.performed += instance.OnLeftPush;
+            @LeftPush.canceled += instance.OnLeftPush;
+            @RightPush.started += instance.OnRightPush;
+            @RightPush.performed += instance.OnRightPush;
+            @RightPush.canceled += instance.OnRightPush;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -364,6 +460,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @LeftPush.started -= instance.OnLeftPush;
+            @LeftPush.performed -= instance.OnLeftPush;
+            @LeftPush.canceled -= instance.OnLeftPush;
+            @RightPush.started -= instance.OnRightPush;
+            @RightPush.performed -= instance.OnRightPush;
+            @RightPush.canceled -= instance.OnRightPush;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -397,5 +499,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnInteract(InputAction.CallbackContext context);
         void OnTestToggleRagdoll(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnLeftPush(InputAction.CallbackContext context);
+        void OnRightPush(InputAction.CallbackContext context);
     }
 }
