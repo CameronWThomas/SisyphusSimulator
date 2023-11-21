@@ -20,14 +20,17 @@ namespace Assets.Scripts.Deer
 
         public override void FurtherInit()
         {
-            curWaypoint = GetBestWaypoint();
             waypoints = waypoints.Where(el => el.waypointType == DeerWaypoint.WaypointType.General).ToArray();
+            curWaypoint = GetBestWaypoint();
+            agent.isStopped = false;
         }
 
         private void Update()
         {
             //go to a general waypoint. Preferably close to the player. Idle a while.
-            agent.SetDestination( curWaypoint.transform.position);
+            if(curWaypoint != null)
+                agent.SetDestination( curWaypoint.transform.position);
+
             //wander around area in radius specified on waypoint
 
             checkChangeCounter += Time.deltaTime;
@@ -40,7 +43,7 @@ namespace Assets.Scripts.Deer
 
             if (IsAtDestination())
             {
-                if(checkChangeCounter > 5f)
+                if(checkChangeCounter > 5f && checkChangeCounter < 6f)
                 {
                     bool shouldCough = UnityEngine.Random.Range(0, 100) > 80;
 

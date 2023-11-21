@@ -39,7 +39,7 @@ namespace Assets.Scripts
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            boulder = GameObject.FindGameObjectsWithTag("Boulder").First();
+            boulder = FindObjectOfType<Boulder>().gameObject;
         }
 
         void FixedUpdate()

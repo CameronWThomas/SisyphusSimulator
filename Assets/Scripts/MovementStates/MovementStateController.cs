@@ -106,8 +106,9 @@ namespace Assets.Scripts.BoulderStuff
             Debug.Log($"impactFactor={impactFactor}");
             if (impactFactor > ragdollActivationFactor)
             {
-                ChangeState(MovementState.Ragdolling);
-                currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
+                //removing for a moment to test
+                //ChangeState(MovementState.Ragdolling);
+                //currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
             }
         }
     }

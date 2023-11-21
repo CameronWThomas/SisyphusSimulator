@@ -41,7 +41,8 @@ namespace Assets.Scripts.MovementStates
         {
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody>();
-            boulderTransform = GameObject.FindGameObjectsWithTag("Boulder").First().transform;
+            Boulder boulder = GameObject.FindFirstObjectByType<Boulder>();
+            boulderTransform = boulder.transform;
             boulderRb = boulderTransform.GetComponent<Rigidbody>();
             msc = GetComponent<MovementStateController>();
         }
