@@ -2,6 +2,7 @@ using Assets.Scripts.BoulderStuff;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace Assets.Scripts.MovementStates
 {
@@ -20,6 +21,7 @@ namespace Assets.Scripts.MovementStates
         protected Rigidbody boulderRb;
         protected Vector3 lastMoveDir;
         protected MovementStateController msc;
+        protected Rig rig;
 
 
         public float MaxSpeed { get; set; }

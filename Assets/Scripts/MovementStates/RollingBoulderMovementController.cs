@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace Assets.Scripts.MovementStates
 {
@@ -36,13 +37,20 @@ namespace Assets.Scripts.MovementStates
         {
             base.Enable();
             animator.SetBool("pushing", true);
+            //rig.weight = 1f;
         }
 
         protected override void Awake()
         {
             base.Awake();
             boulderDetector = GetComponent<BoulderDetector>();
+            rig = GetComponentInChildren<Rig>();
         }        
+        public override void Disable()
+        {
+            base.Disable();
+            //rig.weight = 0f;
+        }
 
         void Update()
         {

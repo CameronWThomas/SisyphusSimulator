@@ -20,6 +20,10 @@ namespace Assets.Scripts.BoulderStuff
         private Vector3 lastVelocity;
 
         private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
+        public bool PushingBoulder => currentMovementController == 
+            movementControllers.Where(el => 
+                el.ApplicableMovementState == MovementState.Pushing
+            ).First();
         
         private void Start()
         {
@@ -106,9 +110,8 @@ namespace Assets.Scripts.BoulderStuff
             Debug.Log($"impactFactor={impactFactor}");
             if (impactFactor > ragdollActivationFactor)
             {
-                //removing for a moment to test
-                //ChangeState(MovementState.Ragdolling);
-                //currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
+                ChangeState(MovementState.Ragdolling);
+                currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
             }
         }
     }
