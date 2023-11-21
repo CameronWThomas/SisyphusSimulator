@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.BoulderStuff;
+using Assets.Scripts.InverseKinematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace Assets.Scripts
         CameraController camera;
         BoulderDetector boulderDetector;
         //RagdollingState ragdoller;
+        ArmIkController armIkController;
 
         public Vector2 moveInput;
         public Vector2 rightStickInput;
@@ -40,6 +42,7 @@ namespace Assets.Scripts
             mc = GetComponent<MovementStateController>();
             camera = GameObject.FindAnyObjectByType<CameraController>();
             boulderDetector = GetComponent<BoulderDetector>();
+            armIkController = GetComponent<ArmIkController>();
             //ragdoller = GetComponent<RagdollingState>();
         }
 
@@ -95,19 +98,24 @@ namespace Assets.Scripts
         void OnLeftPushStart(InputAction.CallbackContext context)
         {
             boulderDetector.LeftHand = true;
+            armIkController.SetPushing(false, true);
+            
         }
         void OnLeftPushEnd(InputAction.CallbackContext context)
         {
             boulderDetector.LeftHand = false;
+            armIkController.SetPushing(false, false);
         }
 
         void OnRightPushStart(InputAction.CallbackContext context)
         {
             boulderDetector.RightHand = true;
+            armIkController.SetPushing(true, true);
         }
         void OnRightPushEnd(InputAction.CallbackContext context)
         {
             boulderDetector.RightHand = false;
+            armIkController.SetPushing(true, false);
 
         }
         void OnJumpStart(InputAction.CallbackContext context)
