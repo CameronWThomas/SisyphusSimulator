@@ -31,6 +31,16 @@ namespace Assets.Scripts.MovementStates
 
         public override MovementState ApplicableMovementState => MovementState.Pushing;
 
+        protected override float Height
+        {
+            get
+            {
+                var boulderRadius = boulderTransform.GetComponent<SphereCollider>().radius;
+                var boulderScale = boulderTransform.localScale.x;
+                return 2f * boulderRadius * boulderScale;
+            }
+        }
+
         private BoulderDetector boulderDetector;
 
         public override void Enable()
@@ -123,7 +133,7 @@ namespace Assets.Scripts.MovementStates
             var correctedMoveDir = GetCorrectedMoveDir(boulderTransform.position);
             if (correctedMoveDir == Vector3.zero)
             {
-                return;
+                correctedMoveDir = transform.forward;
             }
 
             var toBoulderDirection = (boulderTransform.position - transform.position).normalized;

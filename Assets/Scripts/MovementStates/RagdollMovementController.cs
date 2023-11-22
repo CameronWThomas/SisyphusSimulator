@@ -25,7 +25,7 @@ namespace Assets.Scripts.MovementStates
         CinemachineFreeLook cinemachine;
         RagdollStates state = RagdollStates.Initial;
         float? timeOfEvent = null;
-        float? TimePassed => timeOfEvent is null ? null : Time.deltaTime - timeOfEvent;
+        float? TimePassed => timeOfEvent is null ? null : Time.time - timeOfEvent;
 
         bool IsStill => root.velocity.magnitude < 0.01f;
 

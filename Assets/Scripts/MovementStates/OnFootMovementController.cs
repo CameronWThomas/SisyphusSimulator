@@ -30,9 +30,10 @@ namespace Assets.Scripts.MovementStates
         void FixedUpdate()
         {
             lastMoveDir = Vector3.zero;
+            var sprinting = Input.GetKey(KeyCode.LeftShift);
             if (inputMoveDir != Vector3.zero)
             {
-                Move();
+                Move(sprinting);
                 Rotate();
             }
             else if (rb.velocity != Vector3.zero)
@@ -41,7 +42,7 @@ namespace Assets.Scripts.MovementStates
             }
         }
 
-        private void Move()
+        private void Move(bool isSprinting)
         {
             var correctedMoveDir = GetCorrectedMoveDir(Position);
             if (correctedMoveDir == Vector3.zero)
@@ -69,10 +70,11 @@ namespace Assets.Scripts.MovementStates
             var speedCheckVelocity = goingDown 
                 ? new Vector3(rb.velocity.x, 0f, rb.velocity.z)
                 : rb.velocity;
-            if (speedCheckVelocity.magnitude > MaxSpeed)
+            var maxSpeed = isSprinting ? MaxSpeed * 2f : MaxSpeed;
+            if (speedCheckVelocity.magnitude > maxSpeed)
             {
                 speedCheckVelocity.Normalize();
-                speedCheckVelocity *= MaxSpeed;
+                speedCheckVelocity *= maxSpeed;
                 rb.velocity = goingDown
                     ? new Vector3(speedCheckVelocity.x, rb.velocity.y, speedCheckVelocity.z)
                     : speedCheckVelocity;

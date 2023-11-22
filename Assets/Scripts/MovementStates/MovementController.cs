@@ -27,7 +27,7 @@ namespace Assets.Scripts.MovementStates
         public float MaxSpeed { get; set; }
 
         //TODO maybe move to some character info page? used in two locations
-        protected float Height => GetComponent<CapsuleCollider>().height;
+        protected virtual float Height => GetComponent<CapsuleCollider>().height;
         protected float BoulderRadius => boulderTransform.GetComponent<SphereCollider>().radius;
 
 
