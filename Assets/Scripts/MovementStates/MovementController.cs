@@ -1,5 +1,5 @@
 using Assets.Scripts.BoulderStuff;
-using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -80,7 +80,7 @@ namespace Assets.Scripts.MovementStates
 
         private void OnDrawGizmos()
         {
-            if (enabled)
+            if (enabled && !boulderTransform.IsUnityNull())
             {
                 //Drawing the ground checker
                 Handles.color = Color.blue;
