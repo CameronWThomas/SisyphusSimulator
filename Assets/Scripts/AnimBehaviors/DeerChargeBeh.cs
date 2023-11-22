@@ -1,3 +1,4 @@
+using Assets.Scripts.Deer;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,8 @@ public class DeerChargeBeh : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         DeerController dc = animator.GetComponent<DeerController>();
+        DeerHitbox dh = dc.GetComponentInChildren<DeerHitbox>();
+        dh.attacking = false;
         dc.EndCharge();
     }
 

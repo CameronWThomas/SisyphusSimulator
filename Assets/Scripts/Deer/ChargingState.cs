@@ -11,12 +11,22 @@ namespace Assets.Scripts.Deer
     {
         Sisyphus Sisyphus;
         public float dist = Mathf.Infinity;
+        DeerHitbox hitbox;
+        protected void Start()
+        {
+            base.Start();
+            enabled = false;
+        }
         public override void FurtherInit()
         {
             Sisyphus = FindObjectOfType<Sisyphus>();
+            deerController = GetComponent<DeerController>();
             deerController.SetRunning();
             anim.SetBool("charging", true);
             dist = Mathf.Infinity;
+            agent.SetDestination(Sisyphus.transform.position);
+            hitbox = GetComponentInChildren<DeerHitbox>();
+            hitbox.attacking = true;
         }
 
         private void Update()

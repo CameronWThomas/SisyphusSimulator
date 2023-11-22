@@ -18,6 +18,7 @@ namespace Assets.Scripts.Deer
         }
 
         public WaypointType waypointType;
+        public Vector3 lookDir;
 
         private void OnDrawGizmos()
         {
@@ -28,6 +29,8 @@ namespace Assets.Scripts.Deer
             Gizmos.color = Color.blue;
 
             Gizmos.DrawWireSphere(transform.position, wanderRadius);
+
+            Gizmos.DrawLine(transform.position, transform.position + lookDir.normalized * 3);
         }
     }
 }

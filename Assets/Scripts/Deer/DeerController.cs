@@ -59,6 +59,7 @@ public class DeerController : MonoBehaviour
     }
     public void ChangeState(DeerAiState newState)
     {
+        anim.SetBool("wallLean", false);
         if (currentState != null)
         {
             currentState.OnExit();
@@ -112,7 +113,7 @@ public abstract class DeerAiState : MonoBehaviour
 
     bool chargeReady;
     // Start is called before the first frame update
-    void Start()
+    protected void Start()
     {
         anim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();

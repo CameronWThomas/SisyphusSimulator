@@ -20,15 +20,19 @@ namespace Assets.Scripts.Deer
 
         public override void FurtherInit()
         {
-            waypoints = waypoints.Where(el => el.waypointType == DeerWaypoint.WaypointType.General).ToArray();
+            deerController = GetComponent<DeerController>();
+            waypoints = FindObjectsOfType<DeerWaypoint>();
+            waypoints = waypoints.Where(el => el.waypointType == DeerWaypoint.WaypointType.General || el.waypointType ==  DeerWaypoint.WaypointType.WallLean).ToArray();
             curWaypoint = GetBestWaypoint();
             agent.isStopped = false;
             deerController.SetWalking();
             checkChangeCounter = Mathf.Infinity;
+            anim.SetBool("charging", false);
         }
 
         private void Update()
         {
+            anim.SetBool("charging", false);
             dist = Vector3.Distance(transform.position, agent.destination);
             //go to a general waypoint. Preferably close to the player. Idle a while.
             //if (curWaypoint != null)
@@ -40,7 +44,14 @@ namespace Assets.Scripts.Deer
             if( checkChangeCounter > checkChangeWaypointTime )
             {
                 curWaypoint = GetBestWaypoint();
-                SetTargetToRandomPointAroundWaypoint();
+                if(curWaypoint.waypointType == DeerWaypoint.WaypointType.WallLean)
+                {
+                    agent.SetDestination(curWaypoint.transform.position);
+                }
+                else
+                {
+                    SetTargetToRandomPointAroundWaypoint();
+                }
                 checkChangeCounter = 0f;
             }
             //in an attempt to stop spam
@@ -56,9 +67,16 @@ namespace Assets.Scripts.Deer
                 }
             }
 
-            if (IsAtDestination())
+            if (dist < 1)
             {
-                if(checkChangeCounter > 5f && checkChangeCounter < 6f)
+
+                if (curWaypoint.waypointType == DeerWaypoint.WaypointType.WallLean)
+                {
+                    anim.SetBool("wallLean", true);
+                    transform.forward = curWaypoint.lookDir.normalized;
+                }
+
+                if (checkChangeCounter > 5f && checkChangeCounter < 6f)
                 {
                     bool shouldCough = UnityEngine.Random.Range(0, 100) > 80;
 
@@ -76,6 +94,7 @@ namespace Assets.Scripts.Deer
             {
                 anim.SetBool("cough", false);
                 anim.SetBool("eatGrass", false);
+                anim.SetBool("wallLean", false);
             }
 
             

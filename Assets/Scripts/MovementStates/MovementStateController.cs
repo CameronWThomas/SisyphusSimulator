@@ -85,7 +85,12 @@ namespace Assets.Scripts.BoulderStuff
 
             currentMovementController.inputMoveDir = moveDir;
         }
+        public void ToggleRagdoll(float impactFactor, Vector3 direction)
+        {
 
+            ChangeState(MovementState.Ragdolling);
+            currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * direction, ForceMode.Impulse);
+        }
         private void OnCollisionEnter(Collision collision)
         {
             //TODO a lot of how the force of impact can be improved. Partly based on real physics but a bit jank.
@@ -112,6 +117,7 @@ namespace Assets.Scripts.BoulderStuff
             {
                 //ChangeState(MovementState.Ragdolling);
                 //currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
+                //ToggleRagdoll(impactFactor, boulderToDirection);
             }
         }
     }

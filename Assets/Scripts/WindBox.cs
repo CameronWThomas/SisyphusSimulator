@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TreeEditor;
 using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -15,8 +16,16 @@ namespace Assets.Scripts
 
         private List<Rigidbody> rbList = new List<Rigidbody>();
         public Vector3 forceVector;
+        [SerializeField]
+        private Vector3 modulatedForceVector;
+        [SerializeField]
+        private float perlinSampleValue;
         public BoxCollider boxCollider;
 
+        public Vector2 perlinCoords = Vector2.zero;
+        public Vector2 newPerlinCoords = Vector2.zero;
+        public float modulationTickChange = 5f;
+        private float modulationTickCounter = 0f;
         private void OnEnable()
         {
             boxCollider = GetComponent<BoxCollider>();
@@ -33,12 +42,28 @@ namespace Assets.Scripts
         }
         private void Update()
         {
+            modulationTickCounter += Time.deltaTime;
+            if(modulationTickCounter > modulationTickChange)
+            {
+                newPerlinCoords.x = perlinCoords.x + UnityEngine.Random.Range(0, 5);
+                newPerlinCoords.y = perlinCoords.y + UnityEngine.Random.Range(0, 5);
+                modulationTickCounter = 0f;
+            }
+
+            perlinCoords = Vector2.Lerp(perlinCoords, newPerlinCoords, Time.deltaTime);
 
             if (rbList.Count > 0)
             {
                 foreach (Rigidbody rb in rbList)
                 {
-                    rb.AddForce(forceVector);
+                    float dist = Vector3.Distance(rb.transform.position, transform.position + boxCollider.center);
+                    modulatedForceVector = forceVector;
+                    perlinSampleValue = 0.3f + Mathf.PerlinNoise(perlinCoords.x, perlinCoords.y);
+                    if (perlinSampleValue == 0f) perlinSampleValue = 0.01f;
+                    modulatedForceVector *= perlinSampleValue;
+
+                    Vector3 distAdjusted = modulatedForceVector / dist;
+                    rb.AddForce(distAdjusted);
                 }
             }
         }
