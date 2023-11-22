@@ -27,7 +27,9 @@ namespace Assets.Scripts.MovementStates
         public float MaxSpeed { get; set; }
 
         //TODO maybe move to some character info page? used in two locations
-        protected virtual float Height => GetComponent<CapsuleCollider>().height;
+        protected float PlayerHeight => GetComponent<CapsuleCollider>().height;
+
+        protected virtual float Height => PlayerHeight;
         protected float BoulderRadius => boulderTransform.GetComponent<SphereCollider>().radius;
 
 
@@ -36,7 +38,7 @@ namespace Assets.Scripts.MovementStates
         public abstract MovementState ApplicableMovementState { get; }
 
 
-        public Vector3 Position => transform.position + Height / 2 * transform.up;
+        public Vector3 Position => transform.position + PlayerHeight / 2 * transform.up;
 
 
         protected virtual void Awake()
