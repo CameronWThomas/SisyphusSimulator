@@ -79,18 +79,19 @@ namespace Assets.Scripts.BoulderStuff
 
             currentMovementController.inputMoveDir = moveDir;
         }
-        public void ToggleRagdoll(float impactFactor, Vector3 direction)
+        public void ToggleRagdoll(Vector3 forceVector)
         {
 
             ChangeState(MovementState.Ragdolling);
-            currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * direction, ForceMode.Impulse);
+            currentMovementController.AddForce(forceVector, ForceMode.Impulse);
         }
         private void OnCollisionEnter(Collision collision)
         {
             if (collision.impulse.magnitude > ragdollActivationImpulse)
             {
-                ChangeState(MovementState.Ragdolling);
-                currentMovementController.AddForce(collision.impulse, ForceMode.Impulse);
+                ToggleRagdoll(collision.impulse);
+                //ChangeState(MovementState.Ragdolling);
+                //currentMovementController.AddForce(collision.impulse, ForceMode.Impulse);
             }
         }
     }

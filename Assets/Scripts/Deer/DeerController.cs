@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using Assets.Scripts.BoulderStuff;
 using Assets.Scripts.Deer;
+using Assets.Scripts.MovementStates;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class DeerController : MonoBehaviour
     public DeerAiState currentState;
     public GrazingState grazingState;
     public ChargingState chargingState;
+    DeerRagdollController drc;
 
     public float BehRecheckCounter = 0f;
     public Vector2 BehRecheckFrameRange = new Vector2(20, 60);
@@ -27,6 +29,9 @@ public class DeerController : MonoBehaviour
     public float walkSpeed = 3.5f;
 
     public float hostilityChance = 5f;
+
+
+    public float ragdollActivationImpulse = 200f;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +44,7 @@ public class DeerController : MonoBehaviour
         grazingState = GetComponent<GrazingState>();
         chargingState = GetComponent<ChargingState>();
         currentState = grazingState;
-
+        drc = GetComponent<DeerRagdollController>();
         agent.speed = walkSpeed;
         BehRecheckCounter = Mathf.Infinity;
 
@@ -101,6 +106,25 @@ public class DeerController : MonoBehaviour
     {
         agent.speed = walkSpeed;
     }
+
+    private void Kill(Vector3 forceImpulse)
+    {
+
+        agent.isStopped = true;
+
+        currentState.enabled = false;
+        drc.EnableRagdoll();
+        drc.root.AddForce(forceImpulse, ForceMode.Impulse);
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.impulse.magnitude > ragdollActivationImpulse)
+        {
+            Kill(collision.impulse);
+            //ChangeState(MovementState.Ragdolling);
+            //currentMovementController.AddForce(collision.impulse, ForceMode.Impulse);
+        }
+    }
 }
 
 public abstract class DeerAiState : MonoBehaviour
@@ -159,4 +183,5 @@ public abstract class DeerAiState : MonoBehaviour
     {
         this.enabled = false;
     }
+    
 }

@@ -31,7 +31,7 @@ namespace Assets.Scripts.Deer
                 {
                     MovementStateController msc = sis.GetComponent<MovementStateController>();
                     Vector3 dir = (msc.transform.position - dc.transform.position).normalized;
-                    msc.ToggleRagdoll(impactFactor, dir);
+                    msc.ToggleRagdoll(impactFactor * dir);
                 }
             }
         }
