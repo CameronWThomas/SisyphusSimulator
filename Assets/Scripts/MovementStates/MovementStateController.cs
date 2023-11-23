@@ -7,19 +7,18 @@ namespace Assets.Scripts.BoulderStuff
     public class MovementStateController : MonoBehaviour
     {
         public float maxSpeed = 5f;
-        public float ragdollActivationFactor = 1250f;
-        public float ragdollImpactMitigation = 100f;
-
-        private Vector3 moveDir;
+        public float ragdollActivationImpulse = 200f;
 
         private CameraController cameraRef;
         private MovementController[] movementControllers;
         private MovementController currentMovementController;
         private BoulderDetector boulderDetector;
         private Rigidbody rb;
-        private Vector3 lastVelocity;
+
+        private Vector3 moveDir;
 
         private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
+
         public bool PushingBoulder => currentMovementController == 
             movementControllers.Where(el => 
                 el.ApplicableMovementState == MovementState.Pushing
@@ -66,11 +65,6 @@ namespace Assets.Scripts.BoulderStuff
             }
         }
 
-        private void LateUpdate()
-        {
-            lastVelocity = rb.velocity;
-        }
-
         public void ChangeState(MovementState newState)
         {
             if (currentMovementController.ApplicableMovementState == newState)
@@ -93,31 +87,10 @@ namespace Assets.Scripts.BoulderStuff
         }
         private void OnCollisionEnter(Collision collision)
         {
-            //TODO a lot of how the force of impact can be improved. Partly based on real physics but a bit jank.
-            //TODO this should happen with anything, not just the boulder (long falls basically)
-
-            if (!collision.transform.CompareTag("Boulder") && CurrentMovementState != MovementState.Ragdolling)
+            if (collision.impulse.magnitude > ragdollActivationImpulse)
             {
-                return;
-            }
-
-            var boulderTransform = collision.transform;
-            var boulderRb = boulderTransform.GetComponent<Rigidbody>();
-            
-            var boulderToDirection = (currentMovementController.Position - boulderTransform.position).normalized;
-            var magitudeVelocity = Vector3.Dot(boulderRb.velocity - lastVelocity, boulderToDirection);
-            if (magitudeVelocity < 0f)
-            {
-                return;
-            }
-
-            var impactFactor = ((boulderRb.mass / 2f) * (magitudeVelocity / Time.fixedDeltaTime)) / rb.mass;
-            Debug.Log($"impactFactor={impactFactor}");
-            if (impactFactor > ragdollActivationFactor)
-            {
-                //ChangeState(MovementState.Ragdolling);
-                //currentMovementController.AddForce((impactFactor / ragdollImpactMitigation) * boulderToDirection, ForceMode.Impulse);
-                //ToggleRagdoll(impactFactor, boulderToDirection);
+                ChangeState(MovementState.Ragdolling);
+                currentMovementController.AddForce(collision.impulse, ForceMode.Impulse);
             }
         }
     }

@@ -1,5 +1,5 @@
 using Assets.Scripts.BoulderStuff;
-using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -27,7 +27,9 @@ namespace Assets.Scripts.MovementStates
         public float MaxSpeed { get; set; }
 
         //TODO maybe move to some character info page? used in two locations
-        protected float Height => GetComponent<CapsuleCollider>().height;
+        protected float PlayerHeight => GetComponent<CapsuleCollider>().height;
+
+        protected virtual float Height => PlayerHeight;
         protected float BoulderRadius => boulderTransform.GetComponent<SphereCollider>().radius;
 
 
@@ -36,7 +38,7 @@ namespace Assets.Scripts.MovementStates
         public abstract MovementState ApplicableMovementState { get; }
 
 
-        public Vector3 Position => transform.position + Height / 2 * transform.up;
+        public Vector3 Position => transform.position + PlayerHeight / 2 * transform.up;
 
 
         protected virtual void Awake()
@@ -80,7 +82,7 @@ namespace Assets.Scripts.MovementStates
 
         private void OnDrawGizmos()
         {
-            if (enabled)
+            if (enabled && !boulderTransform.IsUnityNull())
             {
                 //Drawing the ground checker
                 Handles.color = Color.blue;

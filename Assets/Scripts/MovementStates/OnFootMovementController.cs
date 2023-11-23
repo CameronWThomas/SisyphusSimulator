@@ -9,6 +9,7 @@ namespace Assets.Scripts.MovementStates
     {
         public float forceModifier = 30f;
         public float slowDownModifer = 10f;
+        public float sprintSpeedMultiplier = 2f;
 
         [Range(0f, 2f)]
         public float boulderMovementPreventionDistance = 1f;
@@ -69,10 +70,12 @@ namespace Assets.Scripts.MovementStates
             var speedCheckVelocity = goingDown 
                 ? new Vector3(rb.velocity.x, 0f, rb.velocity.z)
                 : rb.velocity;
-            if (speedCheckVelocity.magnitude > MaxSpeed)
+
+            var maxSpeed = GetComponent<PlayerInputBus>().IsSprinting ? MaxSpeed * sprintSpeedMultiplier : MaxSpeed;
+            if (speedCheckVelocity.magnitude > maxSpeed)
             {
                 speedCheckVelocity.Normalize();
-                speedCheckVelocity *= MaxSpeed;
+                speedCheckVelocity *= maxSpeed;
                 rb.velocity = goingDown
                     ? new Vector3(speedCheckVelocity.x, rb.velocity.y, speedCheckVelocity.z)
                     : speedCheckVelocity;

@@ -36,6 +36,12 @@ namespace Assets.Scripts
         public InputAction leftpush;
         public InputAction rightPush;
 
+        // Proposal for how to do this differently. I'm not a fan of this directly informing scripts about input. I think
+        //  scripts should have a reference to this and ask it for input whenever they need information. If information is
+        //  needed as it happens rather than when the Update methods are called, they can just go directly to the InputAction
+        //  and subscribe to it.
+        public bool IsSprinting { get; private set; } = false;
+
         private void Start()
         {
             //bpmc = GetComponent<BoulderPhysicsMvmntController>();
@@ -94,7 +100,13 @@ namespace Assets.Scripts
             rightPush.Enable();
             rightPush.performed += OnRightPushStart;
             rightPush.canceled += OnRightPushEnd;
+
+            var sprint = inputActions.Player.Sprint;
+            sprint.Enable();
+            sprint.performed += OnSprintStart;
+            sprint.canceled += OnSprintEnd;
         }
+
         void OnLeftPushStart(InputAction.CallbackContext context)
         {
             boulderDetector.LeftHand = true;
@@ -145,6 +157,16 @@ namespace Assets.Scripts
             //mc.SwitchState();
         }
 
+        private void OnSprintStart(InputAction.CallbackContext context)
+        {
+            IsSprinting = true;
+        }
+
+        private void OnSprintEnd(InputAction.CallbackContext context)
+        {
+            IsSprinting = false;
+        }
+
         private void OnDisable()
         {
             move.Disable();
@@ -154,7 +176,7 @@ namespace Assets.Scripts
             jump.Disable();
             leftpush.Disable();
             rightPush.Disable();
-
+            inputActions.Player.Sprint.Disable();
         }
     }
 }
