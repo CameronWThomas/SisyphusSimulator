@@ -14,6 +14,7 @@ namespace Assets.Scripts
         Sisyphus Sisyphus;
 
         private float zero;
+        public bool paused;
 
         private void Start()
         {
@@ -26,6 +27,20 @@ namespace Assets.Scripts
             //treat my y as max height
             absurdityLevel = (Sisyphus.transform.position.y - zero) / transform.position.y;
 
+        }
+
+        public void PauseTriggered()
+        {
+            paused = !paused;
+
+            if(paused)
+            {
+                Time.timeScale = 0;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
         }
     }
 }

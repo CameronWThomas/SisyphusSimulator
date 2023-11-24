@@ -8,7 +8,7 @@ public class BoulderScaleAdjuster : MonoBehaviour
 {
     Rigidbody rb;
     float StartingY;
-    Vector3 StartingScale;
+    public Vector3 StartingScale;
     float StartingMass;
     float StartingDrag;
     [SerializeField]

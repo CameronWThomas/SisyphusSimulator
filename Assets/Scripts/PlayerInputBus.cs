@@ -21,9 +21,10 @@ namespace Assets.Scripts
         BoulderDetector boulderDetector;
         //RagdollingState ragdoller;
         ArmIkController armIkController;
-
+        WorldManager worldManager;
         public Vector2 moveInput;
         public Vector2 rightStickInput;
+
 
         //public bool interactInput;
 
@@ -32,6 +33,7 @@ namespace Assets.Scripts
         public InputAction interact;
         public InputAction testRagdoll;
         public InputAction jump;
+        public InputAction pause;
 
         public InputAction leftpush;
         public InputAction rightPush;
@@ -49,6 +51,7 @@ namespace Assets.Scripts
             camera = GameObject.FindAnyObjectByType<CameraController>();
             boulderDetector = GetComponent<BoulderDetector>();
             armIkController = GetComponent<ArmIkController>();
+            worldManager = FindObjectOfType<WorldManager>();
             //ragdoller = GetComponent<RagdollingState>();
         }
 
@@ -105,8 +108,16 @@ namespace Assets.Scripts
             sprint.Enable();
             sprint.performed += OnSprintStart;
             sprint.canceled += OnSprintEnd;
+
+            pause = inputActions.Player.Pause;
+            pause.Enable();
+            pause.performed += PausePerformed;
         }
 
+        void PausePerformed(InputAction.CallbackContext context)
+        {
+            worldManager.PauseTriggered();
+        }
         void OnLeftPushStart(InputAction.CallbackContext context)
         {
             boulderDetector.LeftHand = true;
@@ -177,6 +188,7 @@ namespace Assets.Scripts
             leftpush.Disable();
             rightPush.Disable();
             inputActions.Player.Sprint.Disable();
+            pause.Disable();
         }
     }
 }
