@@ -40,7 +40,7 @@ namespace Assets.Scripts.BoulderStuff
                 movementController.MaxSpeed = maxSpeed;
             }
 
-            currentMovementController = movementControllers.First(x => x.ApplicableMovementState == MovementState.OnFoot);
+            currentMovementController = movementControllers.First(x => x.ApplicableMovementState == MovementState.Ragdolling );
             currentMovementController.Enable();
         }
 

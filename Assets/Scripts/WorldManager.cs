@@ -16,10 +16,13 @@ namespace Assets.Scripts
         private float zero;
         public bool paused;
 
+        GuiText[] guis;
+
         private void Start()
         {
             Sisyphus = FindObjectOfType<Sisyphus>();
             zero = Sisyphus.transform.position.y;
+            guis = FindObjectsOfType<GuiText>();
         }
 
         public void Update()
@@ -35,11 +38,25 @@ namespace Assets.Scripts
 
             if(paused)
             {
+                foreach(GuiText gui in guis)
+                {
+                    if (gui.pauseText)
+                    {
+                        gui.ShowText();
+                    }
+                }
                 Time.timeScale = 0;
             }
             else
             {
                 Time.timeScale = 1;
+                foreach (GuiText gui in guis)
+                {
+                    if (gui.pauseText)
+                    {
+                        gui.HideText();
+                    }
+                }
             }
         }
     }
