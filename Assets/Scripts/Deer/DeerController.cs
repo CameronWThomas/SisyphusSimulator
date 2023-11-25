@@ -32,6 +32,9 @@ public class DeerController : MonoBehaviour
 
 
     public float ragdollActivationImpulse = 200f;
+
+    private AudioSource player;
+    public AudioClip deathSound;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,7 +50,7 @@ public class DeerController : MonoBehaviour
         drc = GetComponent<DeerRagdollController>();
         agent.speed = walkSpeed;
         BehRecheckCounter = Mathf.Infinity;
-
+        player = GetComponent<AudioSource>();   
     }
 
     // Update is called once per frame
@@ -109,7 +112,8 @@ public class DeerController : MonoBehaviour
 
     private void Kill(Vector3 forceImpulse)
     {
-
+        player.volume = 1;
+        player.PlayOneShot(deathSound);
         agent.isStopped = true;
 
         currentState.enabled = false;

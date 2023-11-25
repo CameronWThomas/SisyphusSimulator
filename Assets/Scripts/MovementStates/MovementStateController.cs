@@ -19,6 +19,8 @@ namespace Assets.Scripts.BoulderStuff
 
         private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
 
+        private AudioSource player;
+        public AudioClip hitSound;
         public bool PushingBoulder => currentMovementController == 
             movementControllers.Where(el => 
                 el.ApplicableMovementState == MovementState.Pushing
@@ -30,6 +32,7 @@ namespace Assets.Scripts.BoulderStuff
             movementControllers = GetComponents<MovementController>();
             boulderDetector = GetComponent<BoulderDetector>();
             rb = GetComponent<Rigidbody>();
+            player = GetComponent<AudioSource>();
 
             foreach (var movementController in movementControllers)
             {
@@ -81,7 +84,7 @@ namespace Assets.Scripts.BoulderStuff
         }
         public void ToggleRagdoll(Vector3 forceVector)
         {
-
+            player.PlayOneShot(hitSound);
             ChangeState(MovementState.Ragdolling);
             currentMovementController.AddForce(forceVector, ForceMode.Impulse);
         }

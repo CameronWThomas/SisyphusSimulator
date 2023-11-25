@@ -4,15 +4,24 @@ using UnityEngine;
 
 public class DeerIdleBehaviors : StateMachineBehaviour
 {
-    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    AudioSource audioSource;
+    bool hasCoughed = false;
+    //OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        audioSource = animator.GetComponent<AudioSource>();
+        hasCoughed = false;
+    }
 
     //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        if (stateInfo.IsName("Cough") && stateInfo.normalizedTime > 0.3f && !hasCoughed)
+        {
+            hasCoughed = true;
+            audioSource.Play();
+        }
+
         if(stateInfo.normalizedTime > 0.9f)
         {
             animator.SetBool("cough", false);
