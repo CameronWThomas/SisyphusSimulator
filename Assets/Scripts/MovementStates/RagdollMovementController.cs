@@ -116,9 +116,11 @@ namespace Assets.Scripts.MovementStates
             cinemachine.Follow = root.transform;
             cinemachine.LookAt = root.transform;
         }
-
         private void DisableRagdoll()
         {
+            Vector3 rootpos = root.position;
+            //msc.handjamPosFix = rootpos;
+            transform.position = rootpos;
             rb.isKinematic = false;
             rb.useGravity = true;
             rb.GetComponent<Collider>().enabled = true;
@@ -130,8 +132,9 @@ namespace Assets.Scripts.MovementStates
                 b.GetComponent<Collider>().enabled = false;
             }
 
-            transform.position = root.position;
+            transform.position = rootpos;
             animator.enabled = true;
+            transform.position = rootpos;
 
             cinemachine.Follow = transform;
             cinemachine.LookAt = transform;

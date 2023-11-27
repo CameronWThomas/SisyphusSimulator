@@ -16,7 +16,8 @@ namespace Assets.Scripts.BoulderStuff
         private Rigidbody rb;
 
         private Vector3 moveDir;
-
+        //public Vector3 handjamPosFix = Vector3.zero;
+        //bool waitFrame = false;
         private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
 
         private AudioSource player;
@@ -66,8 +67,19 @@ namespace Assets.Scripts.BoulderStuff
             {
                 ChangeState(newState);
             }
-        }
 
+            ////may god forgive me for what i've done
+            //if (handjamPosFix != Vector3.zero)
+            //{
+            //    transform.position = handjamPosFix;
+            //    if (!waitFrame) waitFrame = true;
+            //    else
+            //    {
+            //        handjamPosFix = Vector3.zero;
+            //        waitFrame = false;
+            //    }
+            //}
+        }
         public void ChangeState(MovementState newState)
         {
             if (currentMovementController.ApplicableMovementState == newState)

@@ -69,11 +69,13 @@ namespace Assets.Scripts.Deer
 
             if (dist < 1)
             {
-
-                if (curWaypoint.waypointType == DeerWaypoint.WaypointType.WallLean)
+                if (curWaypoint != null)
                 {
-                    anim.SetBool("wallLean", true);
-                    transform.forward = curWaypoint.lookDir.normalized;
+                    if (curWaypoint.waypointType == DeerWaypoint.WaypointType.WallLean)
+                    {
+                        anim.SetBool("wallLean", true);
+                        transform.forward = curWaypoint.lookDir.normalized;
+                    }
                 }
 
                 if (checkChangeCounter > 5f && checkChangeCounter < 6f)

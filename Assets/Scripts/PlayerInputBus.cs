@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Windows;
 
 namespace Assets.Scripts
@@ -38,6 +39,7 @@ namespace Assets.Scripts
         public InputAction leftpush;
         public InputAction rightPush;
 
+        public InputAction restart;
         // Proposal for how to do this differently. I'm not a fan of this directly informing scripts about input. I think
         //  scripts should have a reference to this and ask it for input whenever they need information. If information is
         //  needed as it happens rather than when the Update methods are called, they can just go directly to the InputAction
@@ -112,8 +114,19 @@ namespace Assets.Scripts
             pause = inputActions.Player.Pause;
             pause.Enable();
             pause.performed += PausePerformed;
-        }
 
+            restart = inputActions.Player.Restart;
+            restart.Enable();
+            restart.performed += RestartPerformed;
+        }
+        void RestartPerformed(InputAction.CallbackContext context)
+        {
+            if (worldManager.paused)
+            {
+                Time.timeScale = 1;
+                SceneManager.LoadScene(Application.loadedLevel);
+            }
+        }
         void PausePerformed(InputAction.CallbackContext context)
         {
             worldManager.PauseTriggered();
@@ -189,6 +202,7 @@ namespace Assets.Scripts
             rightPush.Disable();
             inputActions.Player.Sprint.Disable();
             pause.Disable();
+            restart.Disable();
         }
     }
 }
