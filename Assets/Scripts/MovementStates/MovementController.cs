@@ -56,7 +56,7 @@ namespace Assets.Scripts.MovementStates
         /// </summary>
         protected Vector3 GetCorrectedMoveDir(Vector3 originPosition)
         {
-            if (Physics.Raycast(originPosition, Vector3.down, out var hitInfo, Height * 1.2f)) //TODO check for ground tag?
+            if (Physics.Raycast(originPosition, Vector3.down, out var hitInfo, Height * 1.1f)) //TODO check for ground tag?
             {
                 var angle = -Mathf.Abs(90f - Vector3.Angle(transform.forward, hitInfo.normal));
                 return Quaternion.Euler(angle, 0f, 0f) * inputMoveDir;
