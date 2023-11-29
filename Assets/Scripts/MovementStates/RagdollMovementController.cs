@@ -118,13 +118,6 @@ namespace Assets.Scripts.MovementStates
         }
         private void DisableRagdoll()
         {
-            Vector3 rootpos = root.position;
-            //msc.handjamPosFix = rootpos;
-            transform.position = rootpos;
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            rb.GetComponent<Collider>().enabled = true;
-
             foreach (var b in bones)
             {
                 b.isKinematic = true;
@@ -132,12 +125,22 @@ namespace Assets.Scripts.MovementStates
                 b.GetComponent<Collider>().enabled = false;
             }
 
-            transform.position = rootpos;
             animator.enabled = true;
+            Vector3 rootpos = new Vector3(root.position.x, root.position.y, root.position.z);
+            //msc.handjamPosFix = rootpos;
+            //transform.position = rootpos;
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.GetComponent<Collider>().enabled = true;
+
+            
+
             transform.position = rootpos;
 
             cinemachine.Follow = transform;
             cinemachine.LookAt = transform;
+
+            
         }
     }
 }

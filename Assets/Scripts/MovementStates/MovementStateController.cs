@@ -16,8 +16,6 @@ namespace Assets.Scripts.BoulderStuff
         private Rigidbody rb;
 
         private Vector3 moveDir;
-        //public Vector3 handjamPosFix = Vector3.zero;
-        //bool waitFrame = false;
         private MovementState CurrentMovementState => currentMovementController.ApplicableMovementState;
 
         private AudioSource player;
@@ -47,6 +45,7 @@ namespace Assets.Scripts.BoulderStuff
 
         private void Update()
         {
+            
             var input = GetComponent<PlayerInputBus>().moveInput;
             moveDir = (new Vector3(input.x, 0, input.y).normalized) * input.magnitude;
             moveDir = cameraRef.PlanarRotation2 * moveDir;
@@ -54,11 +53,11 @@ namespace Assets.Scripts.BoulderStuff
             currentMovementController.inputMoveDir = moveDir;
 
             MovementState newState = CurrentMovementState;
-            if (Input.GetKeyDown(KeyCode.R) && CurrentMovementState != MovementState.Ragdolling)
-            {
-                newState = MovementState.Ragdolling;
-            }
-            else if (CurrentMovementState != MovementState.Ragdolling)
+            //if (Input.GetKeyDown(KeyCode.R) && CurrentMovementState != MovementState.Ragdolling)
+            //{
+            //    newState = MovementState.Ragdolling;
+            //}
+            if (CurrentMovementState != MovementState.Ragdolling)
             {
                 newState = boulderDetector.IsPushing ? MovementState.Pushing : MovementState.OnFoot;
             }
@@ -68,17 +67,8 @@ namespace Assets.Scripts.BoulderStuff
                 ChangeState(newState);
             }
 
-            ////may god forgive me for what i've done
-            //if (handjamPosFix != Vector3.zero)
-            //{
-            //    transform.position = handjamPosFix;
-            //    if (!waitFrame) waitFrame = true;
-            //    else
-            //    {
-            //        handjamPosFix = Vector3.zero;
-            //        waitFrame = false;
-            //    }
-            //}
+            
+            
         }
         public void ChangeState(MovementState newState)
         {

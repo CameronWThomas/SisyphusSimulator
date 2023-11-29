@@ -54,6 +54,10 @@ namespace Assets.Scripts
                     {
                         gui.ShowText();
                     }
+                    else
+                    {
+                        gui.HideText();
+                    }
                 }
                 Time.timeScale = 0;
             }
@@ -68,6 +72,10 @@ namespace Assets.Scripts
                     if (gui.pauseText)
                     {
                         gui.HideText();
+                    }
+                    else
+                    {
+                        gui.ShowText();
                     }
                 }
             }
