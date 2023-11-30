@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.XR;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
@@ -64,33 +65,23 @@ namespace Assets.Scripts.MovementStates
             lastMoveDir = correctedMoveDir;
             rb.AddForce(50 * rb.mass * forceModifier * Time.fixedDeltaTime * correctedMoveDir, ForceMode.Force);
 
-            // Sets max speed taking into account if you are falling (hopefully...)
-            //TODO used by bolder movement controller so should be put in base class
-            var goingDown = rb.velocity.y < 0f;
-            var speedCheckVelocity = goingDown 
-                ? new Vector3(rb.velocity.x, 0f, rb.velocity.z)
-                : rb.velocity;
-
             var maxSpeed = GetComponent<PlayerInputBus>().IsSprinting ? MaxSpeed * sprintSpeedMultiplier : MaxSpeed;
-            if (speedCheckVelocity.magnitude > maxSpeed)
+            if (rb.velocity.magnitude > maxSpeed)
             {
-                speedCheckVelocity.Normalize();
-                speedCheckVelocity *= maxSpeed;
-                rb.velocity = goingDown
-                    ? new Vector3(speedCheckVelocity.x, rb.velocity.y, speedCheckVelocity.z)
-                    : speedCheckVelocity;
+                var newVelocity = rb.velocity.normalized * maxSpeed;
+                rb.velocity = newVelocity;
             }
         }
 
         private void SlowDown()
         {
-            // So we don't fight gravity
-            if (!Physics.Raycast(Position, Vector3.down, Height * 1.2f))
+            // So we only slow down when we are on the ground
+            if (!Physics.Raycast(Position, Vector3.down, Height * 1.1f))
             {
                 return;
             }
 
-            var direction = -rb.velocity;
+            var direction = new Vector3(-rb.velocity.x, 0f, -rb.velocity.z);
             rb.AddForce(50 * rb.mass * slowDownModifer * Time.fixedDeltaTime * direction, ForceMode.Force);
         }
 

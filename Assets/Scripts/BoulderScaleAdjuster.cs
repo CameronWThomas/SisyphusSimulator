@@ -28,7 +28,7 @@ public class BoulderScaleAdjuster : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        StartingY = transform.position.y;
+        StartingY = 0f;
         StartingScale = transform.localScale;
         StartingMass = rb.mass;
         StartingDrag = rb.drag;
