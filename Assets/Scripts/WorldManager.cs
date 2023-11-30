@@ -17,12 +17,19 @@ namespace Assets.Scripts
         public bool paused;
 
         GuiText[] guis;
+        Canvas canvas;
 
         private void Start()
         {
             Sisyphus = FindObjectOfType<Sisyphus>();
             zero = Sisyphus.transform.position.y;
             guis = FindObjectsOfType<GuiText>();
+            canvas = FindObjectOfType<Canvas>();
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            canvas.enabled = false;
         }
 
         public void Update()
@@ -38,23 +45,37 @@ namespace Assets.Scripts
 
             if(paused)
             {
-                foreach(GuiText gui in guis)
+                Cursor.lockState = CursorLockMode.Confined; 
+                Cursor.visible = true;
+                canvas.enabled = true;
+                foreach (GuiText gui in guis)
                 {
                     if (gui.pauseText)
                     {
                         gui.ShowText();
+                    }
+                    else if(!gui.winText)
+                    {
+                        gui.HideText();
                     }
                 }
                 Time.timeScale = 0;
             }
             else
             {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
                 Time.timeScale = 1;
+                canvas.enabled = false;
                 foreach (GuiText gui in guis)
                 {
                     if (gui.pauseText)
                     {
                         gui.HideText();
+                    }
+                    else if (!gui.winText)
+                    {
+                        gui.ShowText();
                     }
                 }
             }

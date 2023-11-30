@@ -1367,7 +1367,7 @@ MonoBehaviour:
   curSpeed: 0
   runSpeed: 7
   walkSpeed: 3.5
-  hostilityChance: 5
+  hostilityChance: 40
   ragdollActivationImpulse: 200
   deathSound: {fileID: 8300000, guid: 686495ee75dd56048936ddb26ece84bf, type: 3}
 --- !u!114 &1952045785743969854
@@ -1475,7 +1475,7 @@ AudioSource:
   m_GameObject: {fileID: 8671884277688118581}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 22f0c596f44d6f04cba4ea195c93f26d, type: 2}
   m_audioClip: {fileID: 8300000, guid: 8efdffbd4b80c3d41a1dd5f8794c87c0, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.12

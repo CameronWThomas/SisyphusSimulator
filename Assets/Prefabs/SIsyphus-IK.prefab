@@ -1605,7 +1605,7 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   restart:
-    m_Name: 
+    m_Name: Restart
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 0d194734-10d3-4395-a35f-19df52eecd06
@@ -1758,7 +1758,7 @@ AudioSource:
   m_GameObject: {fileID: 3148597421449254029}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 22f0c596f44d6f04cba4ea195c93f26d, type: 2}
   m_audioClip: {fileID: 8300000, guid: aa9da6af18019544ba0b3244d87602f4, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.4

@@ -36,8 +36,6 @@ namespace Assets.Scripts
 
         void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
 
             boulder = FindObjectOfType<Boulder>().gameObject;
         }

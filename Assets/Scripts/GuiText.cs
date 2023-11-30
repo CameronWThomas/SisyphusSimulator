@@ -13,6 +13,7 @@ namespace Assets.Scripts
         public List<MeshRenderer> m_renderer;
 
         public bool pauseText = false;
+        public bool winText = false;
         public float ttl = 20f;
         private float ttlCounter = 0f;
         private void Start()
@@ -32,6 +33,10 @@ namespace Assets.Scripts
                 ttlCounter += Time.deltaTime;
                 if (ttlCounter > ttl) HideText();
             }
+        }
+        public void ResetTTL()
+        {
+            ttlCounter = 0f;
         }
 
         public void ShowText()
