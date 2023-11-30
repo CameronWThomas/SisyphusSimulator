@@ -61,7 +61,7 @@ namespace Assets.Scripts
         {
             if (!triggered)
             {
-                Sisyphus boulder = other.GetComponent<Sisyphus>();
+                Boulder boulder = other.GetComponent<Boulder>();
                 if (boulder != null)
                 {
                     ShowWinText();
