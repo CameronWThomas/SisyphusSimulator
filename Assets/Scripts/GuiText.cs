@@ -14,6 +14,7 @@ namespace Assets.Scripts
 
         public bool pauseText = false;
         public bool winText = false;
+        public bool pushText = false;
         public float ttl = 20f;
         private float ttlCounter = 0f;
         private void Start()

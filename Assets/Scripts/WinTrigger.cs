@@ -11,9 +11,11 @@ namespace Assets.Scripts
     public class WinTrigger : MonoBehaviour
     {
         List<GuiText> winText;
+        List<GuiText> pushText;
         public bool triggered = false;
         public Vector3 PushDir;
-        public float PushForce = 1f;
+        public float SisyphusPushForce = 700f;
+        public float BoulderPushForce = 10000f;
         public float pushTime = 15f;
         public float pushCounter = 15f;
         public bool pushed;
@@ -21,12 +23,21 @@ namespace Assets.Scripts
         private void Start()
         {
             winText = FindObjectsOfType<GuiText>().Where(x => x.winText).ToList();
+            pushText = FindObjectsOfType<GuiText>().Where(x => x.pushText).ToList();
             sc = GetComponent<SphereCollider>();    
         }
 
         public void ShowWinText()
         {
             foreach (var text in winText)
+            {
+                text.ResetTTL();
+                text.ShowText();
+            }
+        }
+        public void ShowPushText()
+        {
+            foreach (var text in pushText)
             {
                 text.ResetTTL();
                 text.ShowText();
@@ -44,6 +55,7 @@ namespace Assets.Scripts
                 if (!pushed)
                 {
                     pushed = true;
+                    ShowPushText();
                     PushRigidbodies();
                 }
             }
@@ -52,10 +64,10 @@ namespace Assets.Scripts
         private void PushRigidbodies()
         {
             MovementStateController sisy = GameObject.FindObjectOfType<MovementStateController>();
-            sisy.ToggleRagdoll(PushDir.normalized * PushForce);
+            sisy.ToggleRagdoll(PushDir.normalized * SisyphusPushForce);
             Boulder b = FindObjectOfType<Boulder>();
             Rigidbody bRb = b.GetComponent<Rigidbody>();
-            bRb.AddForce(PushDir.normalized * PushForce, ForceMode.Impulse);
+            bRb.AddForce(PushDir.normalized * BoulderPushForce, ForceMode.Impulse);
         }
         private void OnTriggerEnter(Collider other)
         {
@@ -80,7 +92,9 @@ namespace Assets.Scripts
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position+ (PushDir.normalized * PushForce));
+            Gizmos.DrawLine(transform.position, transform.position+ (PushDir.normalized * SisyphusPushForce));
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.position, transform.position+ (PushDir.normalized * BoulderPushForce));
         }
     }
 }

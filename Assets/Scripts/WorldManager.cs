@@ -22,7 +22,7 @@ namespace Assets.Scripts
         private void Start()
         {
             Sisyphus = FindObjectOfType<Sisyphus>();
-            zero = Sisyphus.transform.position.y;
+            zero = 0f;
             guis = FindObjectsOfType<GuiText>();
             canvas = FindObjectOfType<Canvas>();
 

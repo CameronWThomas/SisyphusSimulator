@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TreeEditor;
 using UnityEditor.PackageManager.UI;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UIElements;
 
 namespace Assets.Scripts
@@ -22,10 +23,14 @@ namespace Assets.Scripts
         private float perlinSampleValue;
         public BoxCollider boxCollider;
 
+        AudioSource windSound;
+        Sisyphus sisyphus;
+
         public Vector2 perlinCoords = Vector2.zero;
         public Vector2 newPerlinCoords = Vector2.zero;
         public float modulationTickChange = 5f;
         private float modulationTickCounter = 0f;
+
         private void OnEnable()
         {
             boxCollider = GetComponent<BoxCollider>();
@@ -39,6 +44,12 @@ namespace Assets.Scripts
                     rbList.Add(rb);
                 }
             }
+        }
+        private void Start()
+        {
+            windSound = GetComponent<AudioSource>();
+            windSound.volume = 0;
+            sisyphus = FindObjectOfType<Sisyphus>();
         }
         private void Update()
         {
@@ -56,6 +67,7 @@ namespace Assets.Scripts
             {
                 foreach (Rigidbody rb in rbList)
                 {
+                    Boulder boulder = rb.GetComponent<Boulder>();
                     float dist = Vector3.Distance(rb.transform.position, transform.position + boxCollider.center);
                     modulatedForceVector = forceVector;
                     perlinSampleValue = 0.3f + Mathf.PerlinNoise(perlinCoords.x, perlinCoords.y);
@@ -63,8 +75,32 @@ namespace Assets.Scripts
                     modulatedForceVector *= perlinSampleValue;
 
                     Vector3 distAdjusted = modulatedForceVector / dist;
-                    rb.AddForce(distAdjusted);
+                    if(boulder != null)
+                    {
+
+                        rb.AddForce(distAdjusted * 50);
+                    }
+                    else
+                    {
+                        rb.AddForce(distAdjusted);
+                    }
                 }
+            }
+
+            if (boxCollider.bounds.Contains(sisyphus.transform.position))
+            {
+                Vector3 refPoint = transform.position + boxCollider.center;
+                refPoint.y = sisyphus.transform.position.y;
+                float dist = Vector3.Distance(refPoint, sisyphus.transform.position);
+
+                ///goal, as distance approaches 0 bring volume to 1;
+
+
+                windSound.volume = Mathf.Lerp(windSound.volume, 1 - dist / 100f, Time.deltaTime * 2);
+            }
+            else
+            {
+                windSound.volume = 0f;
             }
         }
 

@@ -29,7 +29,11 @@ namespace Assets.Scripts
             {
                 foreach(Rigidbody rb in rbList)
                 {
-                    PullRigidbody(rb);
+                    Sisyphus sisy = rb.GetComponent<Sisyphus>();
+                    if (sisy == null)
+                    {
+                        PullRigidbody(rb);
+                    }
                 }
             }
         }
