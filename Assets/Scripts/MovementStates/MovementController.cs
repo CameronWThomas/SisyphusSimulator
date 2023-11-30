@@ -86,9 +86,9 @@ namespace Assets.Scripts.MovementStates
             if (enabled && !boulderTransform.IsUnityNull())
             {
                 //Drawing the ground checker
-                Handles.color = Color.blue;
+                //Handles.color = Color.blue;
 
-                Handles.DrawLine(Position, Position + lastMoveDir, 5f);
+                //Handles.DrawLine(Position, Position + lastMoveDir, 5f);
             }
         }
     }

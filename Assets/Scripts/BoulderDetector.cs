@@ -127,13 +127,13 @@ namespace Assets.Scripts
         {
             var colorAlpha = .25f;
 
-            Handles.color = new Color(0, 0, 1, colorAlpha);
+            //Handles.color = new Color(0, 0, 1, colorAlpha);
             if (lastBli.isInRange)
             {
                 colorAlpha = Mathf.Abs(lastBli.hitAngle) / HalfDetectionAngle;
-                Handles.color = BoulderOnLeft
-                    ? new Color(1, 0, 0, colorAlpha)
-                    : new Color(1, .5f, 0, colorAlpha);
+                //Handles.color = BoulderOnLeft
+                //    ? new Color(1, 0, 0, colorAlpha)
+                //    : new Color(1, .5f, 0, colorAlpha);
             }
 
             var forward = transform.forward;
@@ -151,14 +151,14 @@ namespace Assets.Scripts
             {
                 radius = DetectionRadius;
             }
-            Handles.DrawSolidArc(Position, up, forward, detectionAngleHalf, radius);
-            Handles.DrawSolidArc(Position, up, forward, -detectionAngleHalf, radius);
-            Handles.DrawSolidArc(Position, transform.right, forward, -detectionAngleHalf, radius);
-            Handles.DrawSolidArc(Position, transform.right, forward, detectionAngleHalf, radius);
+            //Handles.DrawSolidArc(Position, up, forward, detectionAngleHalf, radius);
+            //Handles.DrawSolidArc(Position, up, forward, -detectionAngleHalf, radius);
+            //Handles.DrawSolidArc(Position, transform.right, forward, -detectionAngleHalf, radius);
+            //Handles.DrawSolidArc(Position, transform.right, forward, detectionAngleHalf, radius);
 
             if (!boulder.IsUnityNull())
             {
-                Handles.DrawLine(boulder.transform.position, boulder.transform.position + -Resistance, 4f);
+                //Handles.DrawLine(boulder.transform.position, boulder.transform.position + -Resistance, 4f);
             }
         }
 

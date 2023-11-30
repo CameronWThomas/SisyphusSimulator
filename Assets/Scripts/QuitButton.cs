@@ -15,7 +15,7 @@ namespace Assets.Scripts
         {
             Application.Quit();
             //for editor
-            EditorApplication.isPlaying = false;
+            //EditorApplication.isPlaying = false;
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem.Android;
 using UnityEngine.InputSystem.XR;
 
 public class DeerController : MonoBehaviour
