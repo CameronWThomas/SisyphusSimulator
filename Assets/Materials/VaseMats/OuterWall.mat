@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: OuterWallPatern
+  m_Name: OuterWall
   m_Shader: {fileID: -6465566751694194690, guid: d850846a5c7b01a4bafe7d4d91692bb7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -149,6 +149,6 @@ Material:
     - _LitColor: {r: 0.9098039, g: 0.5411765, b: 0.25490198, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShadowColor: {r: 1, g: 0.5960785, b: 0.27058828, a: 1}
-    - _ShadowTextureTiling: {r: 1000, g: 750, b: 0, a: 0}
+    - _ShadowTextureTiling: {r: 200, g: 200, b: 0, a: 0}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
