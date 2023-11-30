@@ -20,6 +20,8 @@ namespace Assets.Scripts.BoulderStuff
 
         private AudioSource player;
         public AudioClip hitSound;
+
+        
         public bool PushingBoulder => currentMovementController == 
             movementControllers.Where(el => 
                 el.ApplicableMovementState == MovementState.Pushing
