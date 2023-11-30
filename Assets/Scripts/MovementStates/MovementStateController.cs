@@ -21,7 +21,9 @@ namespace Assets.Scripts.BoulderStuff
         private AudioSource player;
         public AudioClip hitSound;
 
-        
+        public Vector3 handjamPosFix;
+        public float posFixTime = 2f;
+        public float posFixCounter;
         public bool PushingBoulder => currentMovementController == 
             movementControllers.Where(el => 
                 el.ApplicableMovementState == MovementState.Pushing
@@ -45,6 +47,11 @@ namespace Assets.Scripts.BoulderStuff
             currentMovementController.Enable();
         }
 
+        public void HandJamPosFix(Vector3 posFix)
+        {
+            handjamPosFix = posFix;
+            posFixCounter = 0f;
+        }
         private void Update()
         {
             
@@ -69,6 +76,11 @@ namespace Assets.Scripts.BoulderStuff
                 ChangeState(newState);
             }
 
+            if(posFixCounter < posFixTime) 
+            {
+                posFixCounter += Time.deltaTime;
+                transform.position = handjamPosFix;
+            }
             
             
         }

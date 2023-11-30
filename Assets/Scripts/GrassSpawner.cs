@@ -80,7 +80,7 @@ public class GrassSpawner : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.blue;
+        Gizmos.color = Color.green;
 
         Gizmos.DrawWireCube(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(xSize, snowLine, zSize));
 

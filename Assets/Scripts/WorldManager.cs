@@ -45,7 +45,7 @@ namespace Assets.Scripts
 
             if(paused)
             {
-                Cursor.lockState = CursorLockMode.Confined; 
+                Cursor.lockState = CursorLockMode.None; 
                 Cursor.visible = true;
                 canvas.enabled = true;
                 foreach (GuiText gui in guis)

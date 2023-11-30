@@ -133,13 +133,13 @@ namespace Assets.Scripts.MovementStates
             rb.useGravity = true;
             rb.GetComponent<Collider>().enabled = true;
 
-            
 
             transform.position = rootpos;
 
             cinemachine.Follow = transform;
             cinemachine.LookAt = transform;
 
+            msc.HandJamPosFix(rootpos);
             
         }
     }
