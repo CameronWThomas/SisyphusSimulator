@@ -39,14 +39,15 @@ namespace Assets.Scripts
                     _value = 0.0001f;
             }
 
-            PlayerPrefs.SetFloat(xPrefName, _value);
             if (x)
             {
+                PlayerPrefs.SetFloat(xPrefName, _value);
                 RefreshXSlider(_value);
                 cinemachine.m_XAxis.m_MaxSpeed = _value;
             }
             else
             {
+                PlayerPrefs.SetFloat(yPrefName, _value);
                 RefreshYSlider(_value);
                 cinemachine.m_YAxis.m_MaxSpeed = _value;
             }

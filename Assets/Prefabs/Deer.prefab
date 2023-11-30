@@ -1367,7 +1367,7 @@ MonoBehaviour:
   curSpeed: 0
   runSpeed: 7
   walkSpeed: 3.5
-  hostilityChance: 5
+  hostilityChance: 40
   ragdollActivationImpulse: 200
   deathSound: {fileID: 8300000, guid: 686495ee75dd56048936ddb26ece84bf, type: 3}
 --- !u!114 &1952045785743969854
