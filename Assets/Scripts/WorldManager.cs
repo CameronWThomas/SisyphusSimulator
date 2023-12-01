@@ -54,7 +54,7 @@ namespace Assets.Scripts
                     {
                         gui.ShowText();
                     }
-                    else if(!gui.winText)
+                    else if(!gui.winText && !gui.pushText)
                     {
                         gui.HideText();
                     }
@@ -73,7 +73,7 @@ namespace Assets.Scripts
                     {
                         gui.HideText();
                     }
-                    else if (!gui.winText)
+                    else if (!gui.winText && !gui.pushText)
                     {
                         gui.ShowText();
                     }
