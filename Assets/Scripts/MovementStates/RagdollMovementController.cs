@@ -20,6 +20,7 @@ namespace Assets.Scripts.MovementStates
 
         public Rigidbody root;
         public float timeTillStand = 1.5f;
+        public float isNotMovingBias = 0.1f;
 
         List<Rigidbody> bones;        
         CinemachineFreeLook cinemachine;
@@ -27,7 +28,7 @@ namespace Assets.Scripts.MovementStates
         float? timeOfEvent = null;
         float? TimePassed => timeOfEvent is null ? null : Time.time - timeOfEvent;
 
-        bool IsStill => root.velocity.magnitude < 0.01f;
+        bool IsStill => root.velocity.magnitude < isNotMovingBias;
 
         public override MovementState ApplicableMovementState => MovementState.Ragdolling;
 
