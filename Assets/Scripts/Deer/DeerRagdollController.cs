@@ -14,6 +14,8 @@ namespace Assets.Scripts.Deer
         public Rigidbody root;
         Animator animator;
 
+        private float ragdollStartTime = 0f;
+
         private void Start()
         {
             bones = GetComponentsInChildren<Rigidbody>();
@@ -23,12 +25,17 @@ namespace Assets.Scripts.Deer
 
         private void Update()
         {
-            
+            if (ragdolling && (Time.time - ragdollStartTime) > 2f)
+            {
+                GetComponent<Collider>().enabled = false;
+                ragdollStartTime = float.MaxValue;
+            }
         }
 
         public void EnableRagdoll()
         {
             ragdolling = true;
+            ragdollStartTime = Time.time;
             //rb.isKinematic = true;
             //rb.useGravity = false;
             //rb.GetComponent<Collider>().enabled = false;

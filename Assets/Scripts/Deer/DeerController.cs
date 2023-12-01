@@ -82,8 +82,11 @@ public class DeerController : MonoBehaviour
     }
     public void RecheckBehState()
     {
-
-        if(wm.absurdityLevel < 0.3f)
+        if (drc.ragdolling)
+        {
+            // do nothing
+        }
+        else if(wm.absurdityLevel < 0.3f)
         {
             ChangeState(grazingState);
         }
@@ -118,6 +121,9 @@ public class DeerController : MonoBehaviour
         currentState.enabled = false;
         drc.EnableRagdoll();
         drc.root.AddForce(forceImpulse, ForceMode.Impulse);
+
+        var hitbox = GetComponentInChildren<DeerHitbox>();
+        hitbox.attacking = false;
     }
     private void OnCollisionEnter(Collision collision)
     {
